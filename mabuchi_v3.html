@@ -3150,11 +3150,11 @@ input:checked + .slider:before { transform: translateX(20px); }
 <div id="panel-night" class="panel content"> <div class="night-panel"> <h2> 時間外受付（17:30〜翌8:30）</h2> <p>GPS位置確認 → 受付登録の順で進めてください</p> <div id="night-time-badge" class="night-time-badge out-time">現在時刻確認中...</div> <div id="night-gps-area"> <button class="night-btn" id="btn-gps" onclick="doGPS()"> GPS位置を確認する</button> <div id="night-gps-result" class="night-result" style="display:none;"></div> </div> </div> <div id="night-form-area" style="display:none;"> <div class="form-container"> <h2> 夜間受付登録</h2> <div class="form-desc">GPS認証済み・時間外受付</div> <div class="privacy-note"> 個人情報（名前・電話番号）の入力は不要です</div> <div class="autofill-banner" id="night-autofill-banner"></div> <div class="form-group">
   <label>車両番号<span class="required">必須</span></label>
   <div class="plate-row">
-    <input class="plate-field p-area"  id="nf-p1" placeholder="地名" maxlength="4" oninput="plateInput('nf','p1')" autocomplete="off">
+    <input class="plate-field p-area"  id="nf-p1" placeholder="地名" maxlength="6" oninput="plateInput('nf','p1')" autocomplete="off">
     <span class="plate-sep">·</span>
     <input class="plate-field p-class" id="nf-p2" placeholder="330" maxlength="3" inputmode="numeric" oninput="plateInput('nf','p2')" autocomplete="off">
     <span class="plate-sep">·</span>
-    <input class="plate-field p-kana"  id="nf-p3" placeholder="あ" maxlength="1" oninput="plateInput('nf','p3')" autocomplete="off">
+    <input class="plate-field p-kana"  id="nf-p3" placeholder="あ" maxlength="2" oninput="plateInput('nf','p3')" autocomplete="off">
     <span class="plate-sep">·</span>
     <input class="plate-field p-num"   id="nf-p4" placeholder="1234" maxlength="4" inputmode="numeric" oninput="plateInput('nf','p4')" autocomplete="off">
   </div>
@@ -3175,11 +3175,11 @@ input:checked + .slider:before { transform: translateX(20px); }
 <div id="panel-driver" class="panel content"> <div class="form-container" id="form-area"> <h2> 荷下ろし受付登録（手入力）</h2> <div class="form-desc">ガラケーの方・スキャンできない方はスタッフが代わりに入力します</div> <div class="privacy-note"> 個人情報（名前・電話番号）の入力は不要です</div> <div class="autofill-banner" id="day-autofill-banner"></div> <div class="form-group">
   <label>車両番号<span class="required">必須</span> <span style="font-size:10px;color:#94A3B8;font-weight:normal;">※入力すると前回情報を自動入力</span></label>
   <div class="plate-row">
-    <input class="plate-field p-area"  id="f-p1" placeholder="地名" maxlength="4" oninput="plateInput('f','p1')" autocomplete="off">
+    <input class="plate-field p-area"  id="f-p1" placeholder="地名" maxlength="6" oninput="plateInput('f','p1')" autocomplete="off">
     <span class="plate-sep">·</span>
     <input class="plate-field p-class" id="f-p2" placeholder="330" maxlength="3" inputmode="numeric" oninput="plateInput('f','p2')" autocomplete="off">
     <span class="plate-sep">·</span>
-    <input class="plate-field p-kana"  id="f-p3" placeholder="あ" maxlength="1" oninput="plateInput('f','p3')" autocomplete="off">
+    <input class="plate-field p-kana"  id="f-p3" placeholder="あ" maxlength="2" oninput="plateInput('f','p3')" autocomplete="off">
     <span class="plate-sep">·</span>
     <input class="plate-field p-num"   id="f-p4" placeholder="1234" maxlength="4" inputmode="numeric" oninput="plateInput('f','p4')" autocomplete="off">
   </div>
@@ -3200,69 +3200,31 @@ input:checked + .slider:before { transform: translateX(20px); }
 <!-- ========== 設定 ========== -->
 <div id="panel-settings" class="panel content">
 
+  <!-- ① 表示設定（最もよく変更する） -->
   <div class="setting-section">
-    <h3>🏭 工場基本設定</h3>
+    <h3>⏱ 完了画面の表示設定</h3>
     <div class="setting-row">
-      <div><div class="setting-label">工場名</div><div class="setting-sub">ヘッダーと入口QRに表示されます</div></div>
-    </div>
-    <input type="text" id="cfg-factory-name" class="setting-input-wide" placeholder="例：マブチ 名古屋工場">
-    <div style="margin-top:6px;display:flex;gap:6px;">
-      <button class="setting-btn" onclick="saveFactoryName()">工場名を保存</button>
-    </div>
-  </div>
-
-  <div class="setting-section">
-    <h3>📍 GPS・工場座標設定</h3>
-    <div class="setting-row">
-      <div><div class="setting-label">GPS位置チェック</div><div class="setting-sub">夜間受付時に工場100m以内か確認</div></div>
-      <label class="toggle"><input type="checkbox" id="cfg-gps" checked onchange="saveCfg()"><span class="slider"></span></label>
-    </div>
-    <div class="setting-row">
-      <div><div class="setting-label">判定半径（m）</div><div class="setting-sub">デフォルト：100m</div></div>
-      <input type="number" id="cfg-gps-radius" class="setting-input" value="100" min="50" max="500" onchange="saveCfg()">
-    </div>
-    <div style="margin-top:8px;">
-      <div class="setting-label" style="margin-bottom:4px;">住所から工場座標を設定</div>
-      <div class="setting-sub" style="margin-bottom:6px;">住所を入力して「座標を取得」を押すと自動でGPS座標が設定されます</div>
-      <input type="text" id="cfg-address" class="setting-input-wide" placeholder="例：愛知県弥富市楠3-9-1">
-      <div style="margin-top:6px;display:flex;gap:6px;">
-        <button class="setting-btn sub" onclick="geocodeAddress()">📍 座標を取得</button>
-        <button class="setting-btn" onclick="useCurrentGPS()">現在地を使用</button>
-      </div>
-      <div id="geo-result" class="geo-result" style="display:none;"></div>
-      <div style="margin-top:8px;font-size:11px;color:#64748B;">
-        現在設定座標：<span id="cfg-lat-disp">35.038243</span>, <span id="cfg-lng-disp">136.790384</span>
-      </div>
-      <div style="display:flex;gap:6px;margin-top:4px;">
-        <input type="number" id="cfg-lat" class="setting-input-wide" step="0.000001" placeholder="緯度" style="font-size:12px;" onchange="saveCfg()">
-        <input type="number" id="cfg-lng" class="setting-input-wide" step="0.000001" placeholder="経度" style="font-size:12px;" onchange="saveCfg()">
-      </div>
-    </div>
-  </div>
-
-  <div class="setting-section">
-    <h3>⏱ 待ち時間・通知設定</h3>
-    <div class="setting-row">
-      <div><div class="setting-label">推定待ち時間の表示</div><div class="setting-sub">横浜はOFF推奨（荷下ろし時間が一品一様のため）</div></div>
-      <label class="toggle"><input type="checkbox" id="cfg-estwait" checked onchange="saveCfg()"><span class="slider"></span></label>
-    </div>
-    <div class="setting-row">
-      <div><div class="setting-label">受付番号（何番目）の表示</div><div class="setting-sub">OFFにすると登録完了画面に順番が表示されません（横浜向け）</div></div>
+      <div><div class="setting-label">受付番号（何番目）の表示</div><div class="setting-sub">OFFにすると完了画面に「○番目にご案内」が表示されません</div></div>
       <label class="toggle"><input type="checkbox" id="cfg-show-queue-num" checked onchange="saveCfg()"><span class="slider"></span></label>
     </div>
     <div class="setting-row">
-      <div><div class="setting-label">1件あたり荷下ろし時間（分）</div><div class="setting-sub">推定待ち時間の計算に使用</div></div>
+      <div><div class="setting-label">推定待ち時間の表示</div><div class="setting-sub">OFFにすると完了画面に推定待ち時間が表示されません</div></div>
+      <label class="toggle"><input type="checkbox" id="cfg-estwait" checked onchange="saveCfg()"><span class="slider"></span></label>
+    </div>
+    <div class="setting-row">
+      <div><div class="setting-label">1件あたり荷下ろし時間（分）</div><div class="setting-sub">推定待ち時間の計算に使用（推定待ち表示ONの場合のみ有効）</div></div>
       <input type="number" id="cfg-unload-min" class="setting-input" value="30" min="5" max="180" onchange="saveCfg()">
     </div>
     <div class="setting-row">
-      <div><div class="setting-label">警告する待ち時間（分）</div><div class="setting-sub">この時間を超えると赤色で警告表示</div></div>
+      <div><div class="setting-label">超過警告の閾値（分）</div><div class="setting-sub">この時間を超えると管理画面で赤色警告表示</div></div>
       <input type="number" id="cfg-warn-min" class="setting-input" value="30" min="5" max="120" onchange="saveCfg()">
     </div>
   </div>
 
+  <!-- ② 選択肢設定 -->
   <div class="setting-section">
-    <h3>🚛 荷下ろし場所の設定</h3>
-    <div class="setting-sub" style="margin-bottom:8px;">工場ごとの実態に合わせて荷下ろし場所を設定できます</div>
+    <h3>🚛 荷下ろし場所</h3>
+    <div class="setting-sub" style="margin-bottom:8px;">受付フォームの場所選択肢を工場の実態に合わせて編集できます</div>
     <div class="tag-list" id="location-tags"></div>
     <div class="add-tag-row">
       <input type="text" id="new-location" class="add-tag-input" placeholder="例：4番バース">
@@ -3271,7 +3233,8 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 
   <div class="setting-section">
-    <h3>🔧 荷役方法の設定</h3>
+    <h3>🔧 荷役方法</h3>
+    <div class="setting-sub" style="margin-bottom:8px;">受付フォームの荷役方法の選択肢を編集できます</div>
     <div class="tag-list" id="cargo-tags"></div>
     <div class="add-tag-row">
       <input type="text" id="new-cargo" class="add-tag-input" placeholder="例：クレーン大型">
@@ -3280,7 +3243,8 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 
   <div class="setting-section">
-    <h3>🚌 車種の設定</h3>
+    <h3>🚌 車種</h3>
+    <div class="setting-sub" style="margin-bottom:8px;">受付フォームの車種の選択肢を編集できます</div>
     <div class="tag-list" id="vehicle-tags"></div>
     <div class="add-tag-row">
       <input type="text" id="new-vehicle" class="add-tag-input" placeholder="例：2ton車">
@@ -3288,83 +3252,115 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
   </div>
 
+  <!-- ③ 工場基本設定 -->
   <div class="setting-section">
-    <h3>🗒 横浜追加項目</h3>
+    <h3>🏭 工場基本設定</h3>
     <div class="setting-row">
-      <div><div class="setting-label">客先名・案件名の入力欄</div><div class="setting-sub">横浜工場の要望項目（YKKAP等の案件管理用）</div></div>
+      <div><div class="setting-label">工場名</div><div class="setting-sub">ヘッダーと入口QRコードに表示されます</div></div>
+    </div>
+    <input type="text" id="cfg-factory-name" class="setting-input-wide" placeholder="例：マブチ 名古屋工場">
+    <div style="margin-top:6px;"><button class="setting-btn" onclick="saveFactoryName()">工場名を保存</button></div>
+    <div class="setting-row" style="margin-top:14px;">
+      <div><div class="setting-label">客先名・案件名の入力欄</div><div class="setting-sub">ONにすると受付フォームに客先名欄が追加されます</div></div>
       <label class="toggle"><input type="checkbox" id="cfg-client-field" onchange="saveAndRebuild()"><span class="slider"></span></label>
     </div>
   </div>
 
-  <!-- ===== QRコードURL設定 ===== -->
+  <!-- ④ GPS設定 -->
   <div class="setting-section">
-    <h3>📱 QRコードのURL設定</h3>
-    <div style="font-size:11px;color:#64748B;margin-bottom:10px;line-height:1.6;">
-      Netlifyなどにアップロード後、そのURLをここに入力してください。<br>
-      入力するとQRコードが正しいURLで生成されます。<br>
-      <span style="color:#E07A30;">※空欄の場合は現在開いているページのURLが使われます（ローカル開きではQRが読めません）。</span>
-    </div>
-    <div style="margin-top:6px;">
-      <div class="setting-label" style="margin-bottom:4px;">ページのURL（ベースURL）</div>
-      <input type="url" id="cfg-base-url" class="setting-input-wide"
-        placeholder="例：https://mabuchi-nagoya.netlify.app/mabuchi_v3.html"
-        onchange="saveCfg(); initAllQR();"
-        style="width:100%;padding:8px 10px;border:1px solid #E2E8F0;border-radius:6px;font-size:12px;">
-      <div style="font-size:10px;color:#94A3B8;margin-top:4px;">
-        入力後、QR受付タブと入口QR印刷タブのQRコードが更新されます
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== API連携セクション ===== -->
-  <div class="setting-section">
-    <h3>🔗 外部API連携（将来拡張）</h3>
-    <div style="font-size:11px;color:#64748B;margin-bottom:10px;line-height:1.6;">
-      見越しシステム・WMS・基幹システムとのAPI連携設定です。<br>
-      URLとAPIキーを設定すると、受付登録時に自動でデータを送信します。<br>
-      <span style="color:#E07A30;">※現在はモード設定のみ。API仕様が決まれば即座に連携可能です。</span>
+    <h3>📍 GPS設定（夜間受付）</h3>
+    <div class="setting-row">
+      <div><div class="setting-label">GPS位置チェック</div><div class="setting-sub">夜間受付時に工場敷地内か確認します</div></div>
+      <label class="toggle"><input type="checkbox" id="cfg-gps" checked onchange="saveCfg()"><span class="slider"></span></label>
     </div>
     <div class="setting-row">
-      <div><div class="setting-label">外部API連携を有効にする</div><div class="setting-sub">設定したAPIエンドポイントへデータを送信</div></div>
-      <label class="toggle"><input type="checkbox" id="cfg-api-enabled" onchange="saveCfg()"><span class="slider"></span></label>
+      <div><div class="setting-label">判定半径（m）</div><div class="setting-sub">デフォルト：100m</div></div>
+      <input type="number" id="cfg-gps-radius" class="setting-input" value="100" min="50" max="500" onchange="saveCfg()">
     </div>
-    <div id="api-settings-area">
-      <div style="margin-top:10px;">
-        <div class="setting-label" style="margin-bottom:4px;">APIエンドポイントURL</div>
-        <input type="text" id="cfg-api-url" class="setting-input-wide" placeholder="例：https://your-system.example.com/api/reception" onchange="saveCfg()">
+    <div style="margin-top:8px;">
+      <div class="setting-label" style="margin-bottom:4px;">工場座標の設定</div>
+      <input type="text" id="cfg-address" class="setting-input-wide" placeholder="例：愛知県弥富市楠3-9-1">
+      <div style="margin-top:6px;display:flex;gap:6px;">
+        <button class="setting-btn sub" onclick="geocodeAddress()">📍 住所から座標を取得</button>
+        <button class="setting-btn" onclick="useCurrentGPS()">現在地を使用</button>
       </div>
-      <div style="margin-top:8px;">
-        <div class="setting-label" style="margin-bottom:4px;">APIキー / 認証トークン</div>
-        <input type="password" id="cfg-api-key" class="setting-input-wide" placeholder="例：Bearer eyJhbGc..." onchange="saveCfg()">
+      <div id="geo-result" class="geo-result" style="display:none;"></div>
+      <div style="margin-top:8px;font-size:11px;color:#64748B;">
+        現在の座標：<span id="cfg-lat-disp">35.038243</span>, <span id="cfg-lng-disp">136.790384</span>
       </div>
-      <div style="margin-top:8px;">
-        <div class="setting-label" style="margin-bottom:4px;">送信データ形式</div>
-        <select id="cfg-api-format" class="setting-input-wide" onchange="saveCfg()" style="font-size:13px;">
-          <option value="json">JSON（推奨）</option>
-          <option value="form">Form Data</option>
-        </select>
+      <div style="display:flex;gap:6px;margin-top:4px;">
+        <input type="number" id="cfg-lat" class="setting-input-wide" step="0.000001" placeholder="緯度" style="font-size:12px;" onchange="saveCfg()">
+        <input type="number" id="cfg-lng" class="setting-input-wide" step="0.000001" placeholder="経度" style="font-size:12px;" onchange="saveCfg()">
       </div>
-      <div style="margin-top:10px;display:flex;gap:6px;">
-        <button class="setting-btn sub" onclick="testApiConnection()">🔌 接続テスト</button>
-        <button class="setting-btn green" onclick="showApiSchema()">📄 送信データ確認</button>
-      </div>
-      <div id="api-test-result" class="geo-result" style="display:none;margin-top:6px;"></div>
-    </div>
-    <div style="margin-top:10px;">
-      <div class="setting-label" style="margin-bottom:4px;">送信ログ（直近5件）</div>
-      <div id="api-log" class="api-log">ログなし</div>
-    </div>
-    <div style="margin-top:8px;background:#f8fafc;border-radius:6px;padding:8px;font-size:10px;color:#64748B;line-height:1.6;">
-      <strong>📋 対応予定の連携先：</strong><br>
-      見越しシステム（予約・配車管理）/ WMS（倉庫管理）/ 基幹ERPシステム / Slack・Teams通知 / 他社製荷待ち管理システム
     </div>
   </div>
 
+  <!-- ⑤ 車番履歴 -->
   <div class="setting-section">
-    <h3>🕐 前回登録データ（車番自動補完）</h3>
-    <div class="setting-sub" style="margin-bottom:8px;">車番を入力すると以前の登録情報が自動入力されます。以下は保存済みのデータ一覧です。</div>
+    <h3>🕐 車番の自動補完履歴</h3>
+    <div class="setting-sub" style="margin-bottom:8px;">車番を入力すると前回の登録情報が自動入力されます。登録済みデータ：</div>
     <div id="history-list" style="font-size:11px;color:#64748B;">登録データなし</div>
     <button class="setting-btn" style="margin-top:8px;background:#C0392B;" onclick="clearHistory()">履歴をすべてクリア</button>
+  </div>
+
+  <!-- ⑥ 詳細設定（折りたたみ） -->
+  <div class="setting-section">
+    <h3 onclick="toggleAdvancedSection()" style="cursor:pointer;user-select:none;">
+      🔧 詳細設定 <span id="advanced-toggle-icon" style="font-size:12px;color:#94A3B8;margin-left:4px;">▶ 展開</span>
+    </h3>
+    <div id="advanced-section-body" style="display:none;">
+
+      <!-- QRコードURL -->
+      <div style="padding-top:10px;border-top:1px solid #E2E8F0;margin-top:4px;">
+        <div class="setting-label" style="margin-bottom:4px;">📱 QRコードのURL（ベースURL）</div>
+        <div style="font-size:11px;color:#64748B;margin-bottom:6px;line-height:1.5;">
+          GitHubにアップロード後のURLを入力するとQRコードが正しく生成されます。
+        </div>
+        <input type="url" id="cfg-base-url" class="setting-input-wide"
+          placeholder="例：https://mori1600.github.io/mabuchi-reception/mabuchi_v3.html"
+          onchange="saveCfg(); initAllQR();"
+          style="width:100%;padding:8px 10px;border:1px solid #E2E8F0;border-radius:6px;font-size:12px;">
+      </div>
+
+      <!-- 外部API連携 -->
+      <div style="padding-top:14px;margin-top:14px;border-top:1px solid #E2E8F0;">
+        <div class="setting-label" style="margin-bottom:4px;">🔗 外部API連携</div>
+        <div style="font-size:11px;color:#64748B;margin-bottom:8px;line-height:1.5;">
+          基幹システム・WMS等へのAPI連携設定です。API仕様が決まれば即座に連携できます。
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">外部API連携を有効にする</div></div>
+          <label class="toggle"><input type="checkbox" id="cfg-api-enabled" onchange="saveCfg()"><span class="slider"></span></label>
+        </div>
+        <div id="api-settings-area">
+          <div style="margin-top:10px;">
+            <div class="setting-label" style="margin-bottom:4px;">APIエンドポイントURL</div>
+            <input type="text" id="cfg-api-url" class="setting-input-wide" placeholder="例：https://your-system.example.com/api/reception" onchange="saveCfg()">
+          </div>
+          <div style="margin-top:8px;">
+            <div class="setting-label" style="margin-bottom:4px;">APIキー / 認証トークン</div>
+            <input type="password" id="cfg-api-key" class="setting-input-wide" placeholder="例：Bearer eyJhbGc..." onchange="saveCfg()">
+          </div>
+          <div style="margin-top:8px;">
+            <div class="setting-label" style="margin-bottom:4px;">送信データ形式</div>
+            <select id="cfg-api-format" class="setting-input-wide" onchange="saveCfg()" style="font-size:13px;">
+              <option value="json">JSON（推奨）</option>
+              <option value="form">Form Data</option>
+            </select>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:6px;">
+            <button class="setting-btn sub" onclick="testApiConnection()">🔌 接続テスト</button>
+            <button class="setting-btn green" onclick="showApiSchema()">📄 送信データ確認</button>
+          </div>
+          <div id="api-test-result" class="geo-result" style="display:none;margin-top:6px;"></div>
+        </div>
+        <div style="margin-top:10px;">
+          <div class="setting-label" style="margin-bottom:4px;">送信ログ（直近5件）</div>
+          <div id="api-log" class="api-log">ログなし</div>
+        </div>
+      </div>
+
+    </div><!-- /advanced-section-body -->
   </div>
 
 </div>
@@ -3438,6 +3434,18 @@ function saveAndRebuild() {
   saveCfg();
   rebuildSelects();
 }
+function toggleAdvancedSection() {
+  var body = document.getElementById('advanced-section-body');
+  var icon = document.getElementById('advanced-toggle-icon');
+  if(!body) return;
+  if(body.style.display === 'none') {
+    body.style.display = 'block';
+    if(icon) icon.textContent = '▼ 閉じる';
+  } else {
+    body.style.display = 'none';
+    if(icon) icon.textContent = '▶ 展開';
+  }
+}
 function saveFactoryName() {
   CFG.factoryName = document.getElementById('cfg-factory-name').value.trim() || 'マブチ 荷下ろし受付';
   try { localStorage.setItem('mabuchi_cfg', JSON.stringify(CFG)); } catch(e) {}
@@ -3471,6 +3479,14 @@ function refreshSettingUI() {
   document.getElementById('f-yokohama-group').style.display = CFG.clientField ? '' : 'none';
   // 推定待ち表示ラベル
   document.getElementById('q-avg-label').textContent = CFG.estWaitEnabled ? '平均待ち(分)' : '（推定待ち非表示）';
+  // 完了画面：何番目エリアの表示制御（設定変更が即反映）
+  var qnArea  = document.getElementById('complete-queuenum-area');
+  var nqnArea = document.getElementById('night-complete-queuenum-area');
+  if(qnArea)  qnArea.style.display  = CFG.showQueueNum !== false ? '' : 'none';
+  if(nqnArea) nqnArea.style.display = CFG.showQueueNum !== false ? '' : 'none';
+  // 完了画面：推定待ち時間の表示制御
+  var estEl = document.getElementById('c-estwait');
+  if(estEl) estEl.style.display = CFG.estWaitEnabled ? 'inline-block' : 'none';
   // タグUI
   renderTagList('location-tags', CFG.locations, 'location');
   renderTagList('cargo-tags',    CFG.cargoTypes,  'cargo');
@@ -3648,6 +3664,9 @@ function saveToHistory(plate, company, vehicle, cargo) {
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch(e) {}
 }
 // ===== 車番4分割入力 =====
+// 日本語IME変換中フラグ（フィールドIDごと）
+var plateComposing = {};
+
 function getPlate(prefix) {
   var p1 = (document.getElementById(prefix+'-p1')||{value:''}).value.trim();
   var p2 = (document.getElementById(prefix+'-p2')||{value:''}).value.trim();
@@ -3657,25 +3676,62 @@ function getPlate(prefix) {
   return parts.join(' ');
 }
 
-function plateInput(prefix, field) {
+function initPlateComposition(prefix) {
+  // 各フィールドにIMEイベントを登録（初期化時に一度だけ）
+  ['p1','p2','p3','p4'].forEach(function(f) {
+    var el = document.getElementById(prefix+'-'+f);
+    if(!el || el._plateCompositionBound) return;
+    el._plateCompositionBound = true;
+    el.addEventListener('compositionstart', function() {
+      plateComposing[prefix+'-'+f] = true;
+    });
+    el.addEventListener('compositionend', function() {
+      plateComposing[prefix+'-'+f] = false;
+      // 変換確定後にフォーカス移動判定を実行
+      plateMoveFocus(prefix, f);
+      plateUpdateHidden(prefix);
+    });
+  });
+}
+
+function plateMoveFocus(prefix, field) {
+  // 変換中はフォーカス移動しない
+  if(plateComposing[prefix+'-'+field]) return;
   var p1El = document.getElementById(prefix+'-p1');
   var p2El = document.getElementById(prefix+'-p2');
   var p3El = document.getElementById(prefix+'-p3');
   var p4El = document.getElementById(prefix+'-p4');
-  // 自動フォーカス移動
-  if(field==='p1' && p1El.value.length >= 3) p2El.focus();
-  if(field==='p2' && p2El.value.length >= 3) p3El.focus();
-  if(field==='p3' && p3El.value.length >= 1) p4El.focus();
-  // hidden に結合値をセット
-  var plateVal = getPlate(prefix).replace(/\s/g,'');
+  // p1（地名）: Enterキー or 変換確定後のみ移動。文字数では移動しない
+  // p2（分類番号）: 3桁入力で移動（数字のみなのでIME不要）
+  if(field==='p2' && p2El.value.replace(/\s/g,'').length >= 3) p3El.focus();
+  // p3（ひらがな）: 1文字確定で移動
+  if(field==='p3' && p3El.value.trim().length >= 1) p4El.focus();
+}
+
+function plateUpdateHidden(prefix) {
   var plateDisplay = getPlate(prefix);
+  var plateVal = plateDisplay.replace(/\s/g,'');
   var hiddenEl = document.getElementById(prefix+'-plate');
   if(hiddenEl) hiddenEl.value = plateDisplay;
-  // プレビュー表示
   var prevEl = document.getElementById(prefix+'-plate-preview');
   if(prevEl) prevEl.textContent = plateDisplay ? '📋 ' + plateDisplay : '';
-  // 自動補完
   autoFillByPlate(prefix, plateVal);
+}
+
+function plateInput(prefix, field) {
+  // 変換中はhidden更新とプレビューのみ（フォーカス移動なし）
+  if(plateComposing[prefix+'-'+field]) {
+    plateUpdateHidden(prefix);
+    return;
+  }
+  plateMoveFocus(prefix, field);
+  plateUpdateHidden(prefix);
+}
+
+// フィールドでEnterキーを押したとき地名→分類番号へ移動
+function plateKeydown(prefix, field, event) {
+  if(event.key === 'Enter' || event.key === 'Tab') return; // デフォルト動作に任せる
+  if(event.isComposing) return; // 変換中は無視
 }
 
 function autoFillByPlate(prefix, plateVal) {
@@ -4318,6 +4374,10 @@ function init() {
 
   // QRコード生成（qrcode.js）
   initAllQR();
+
+  // 車番4分割入力：IME変換イベント登録
+  initPlateComposition('f');
+  initPlateComposition('nf');
 
   // Firebase リアルタイムリスナー起動（スマホ↔PC 同期）
   startFirebaseListener();
