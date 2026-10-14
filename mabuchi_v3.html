@@ -3009,6 +3009,16 @@ body { font-family: 'Arial', sans-serif; background: #f0f4f8; color: #1a1a2e; }
   width: 100%; padding: 10px 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 15px; color: #1a1a2e;
 }
 .form-group input:focus, .form-group select:focus { outline: none; border-color: #028090; }
+/* ===== 車番4分割入力 ===== */
+.plate-row { display:flex; gap:6px; align-items:center; }
+.plate-sep { color:#94A3B8; font-size:18px; font-weight:bold; flex-shrink:0; }
+.plate-field { border:1px solid #E2E8F0; border-radius:8px; padding:10px 6px; font-size:16px; color:#1a1a2e; text-align:center; outline:none; }
+.plate-field:focus { border-color:#028090; }
+.plate-field.p-area  { flex:2.5; min-width:0; }
+.plate-field.p-class { flex:1.5; min-width:0; }
+.plate-field.p-kana  { flex:1; min-width:0; }
+.plate-field.p-num   { flex:2; min-width:0; }
+.plate-preview { font-size:11px; color:#028090; margin-top:4px; font-weight:bold; min-height:16px; }
 .submit-btn { width: 100%; padding: 13px; background: #1E3A5F; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 4px; }
 .submit-btn:hover { background: #162154; }
 .submit-btn.night-submit { background: #4A1E8A; }
@@ -3137,7 +3147,21 @@ input:checked + .slider:before { transform: translateX(20px); }
 </div>
 
 <!-- ========== 夜間受付 ========== -->
-<div id="panel-night" class="panel content"> <div class="night-panel"> <h2> 時間外受付（17:30〜翌8:30）</h2> <p>GPS位置確認 → 受付登録の順で進めてください</p> <div id="night-time-badge" class="night-time-badge out-time">現在時刻確認中...</div> <div id="night-gps-area"> <button class="night-btn" id="btn-gps" onclick="doGPS()"> GPS位置を確認する</button> <div id="night-gps-result" class="night-result" style="display:none;"></div> </div> </div> <div id="night-form-area" style="display:none;"> <div class="form-container"> <h2> 夜間受付登録</h2> <div class="form-desc">GPS認証済み・時間外受付</div> <div class="privacy-note"> 個人情報（名前・電話番号）の入力は不要です</div> <div class="autofill-banner" id="night-autofill-banner"></div> <div class="form-group"> <label>車両番号<span class="required">必須</span></label> <input type="text" id="nf-plate" placeholder="例：名古屋 33 あ 1234" oninput="autoFill('nf')" autocomplete="off"> </div> <div class="form-group"> <label>会社名<span class="required">必須</span></label> <input type="text" id="nf-company" placeholder="例：〇〇運輸株式会社"> </div> <div class="form-group"> <label>車種<span class="required">必須</span></label> <select id="nf-vehicle"></select> </div> <div class="form-group"> <label>荷役方法<span class="required">必須</span></label> <select id="nf-cargo"></select> </div> <div class="form-group"> <label>備考（任意）</label> <input type="text" id="nf-note" placeholder="重量物あり、要注意など"> </div> <button class="submit-btn night-submit" onclick="submitNightForm()"> 夜間受付を登録する</button> </div> </div> <div class="complete-screen" id="night-complete-area"> <div class="complete-icon"></div> <div class="complete-num" id="nc-num">—</div> <div class="complete-label">番目にご案内します</div> <div class="info-row"><span>会社名</span><strong id="nc-company">—</strong></div> <div class="info-row"><span>車両番号</span><strong id="nc-plate">—</strong></div> <div class="info-row"><span>受付時刻</span><strong id="nc-time">—</strong></div> <div class="notice-box"> 夜間受付完了。翌朝スタッフが到着順に登録します。</div> <button class="submit-btn night-submit" style="margin-top:12px;" onclick="resetNightForm()">別の車両を登録する</button> </div>
+<div id="panel-night" class="panel content"> <div class="night-panel"> <h2> 時間外受付（17:30〜翌8:30）</h2> <p>GPS位置確認 → 受付登録の順で進めてください</p> <div id="night-time-badge" class="night-time-badge out-time">現在時刻確認中...</div> <div id="night-gps-area"> <button class="night-btn" id="btn-gps" onclick="doGPS()"> GPS位置を確認する</button> <div id="night-gps-result" class="night-result" style="display:none;"></div> </div> </div> <div id="night-form-area" style="display:none;"> <div class="form-container"> <h2> 夜間受付登録</h2> <div class="form-desc">GPS認証済み・時間外受付</div> <div class="privacy-note"> 個人情報（名前・電話番号）の入力は不要です</div> <div class="autofill-banner" id="night-autofill-banner"></div> <div class="form-group">
+  <label>車両番号<span class="required">必須</span></label>
+  <div class="plate-row">
+    <input class="plate-field p-area"  id="nf-p1" placeholder="地名" maxlength="4" oninput="plateInput('nf','p1')" autocomplete="off">
+    <span class="plate-sep">·</span>
+    <input class="plate-field p-class" id="nf-p2" placeholder="330" maxlength="3" inputmode="numeric" oninput="plateInput('nf','p2')" autocomplete="off">
+    <span class="plate-sep">·</span>
+    <input class="plate-field p-kana"  id="nf-p3" placeholder="あ" maxlength="1" oninput="plateInput('nf','p3')" autocomplete="off">
+    <span class="plate-sep">·</span>
+    <input class="plate-field p-num"   id="nf-p4" placeholder="1234" maxlength="4" inputmode="numeric" oninput="plateInput('nf','p4')" autocomplete="off">
+  </div>
+  <div class="plate-preview" id="nf-plate-preview"></div>
+  <input type="hidden" id="nf-plate">
+</div>
+<div class="form-group"> <label>会社名<span class="required">必須</span></label> <input type="text" id="nf-company" placeholder="例：〇〇運輸株式会社"> </div> <div class="form-group"> <label>車種<span class="required">必須</span></label> <select id="nf-vehicle"></select> </div> <div class="form-group"> <label>荷役方法<span class="required">必須</span></label> <select id="nf-cargo"></select> </div> <div class="form-group"> <label>備考（任意）</label> <input type="text" id="nf-note" placeholder="重量物あり、要注意など"> </div> <button class="submit-btn night-submit" onclick="submitNightForm()"> 夜間受付を登録する</button> </div> </div> <div class="complete-screen" id="night-complete-area"> <div class="complete-icon"></div> <div class="complete-num" id="nc-num">—</div> <div class="complete-label">番目にご案内します</div> <div class="info-row"><span>会社名</span><strong id="nc-company">—</strong></div> <div class="info-row"><span>車両番号</span><strong id="nc-plate">—</strong></div> <div class="info-row"><span>受付時刻</span><strong id="nc-time">—</strong></div> <div class="notice-box"> 夜間受付完了。翌朝スタッフが到着順に登録します。</div> <button class="submit-btn night-submit" style="margin-top:12px;" onclick="resetNightForm()">別の車両を登録する</button> </div>
 </div>
 
 <!-- ========== 管理画面 ========== -->
@@ -3148,7 +3172,21 @@ input:checked + .slider:before { transform: translateX(20px); }
 </div>
 
 <!-- ========== ドライバー登録（手入力） ========== -->
-<div id="panel-driver" class="panel content"> <div class="form-container" id="form-area"> <h2> 荷下ろし受付登録（手入力）</h2> <div class="form-desc">ガラケーの方・スキャンできない方はスタッフが代わりに入力します</div> <div class="privacy-note"> 個人情報（名前・電話番号）の入力は不要です</div> <div class="autofill-banner" id="day-autofill-banner"></div> <div class="form-group"> <label>車両番号<span class="required">必須</span> <span style="font-size:10px;color:#94A3B8;font-weight:normal;">※入力すると前回情報を自動入力</span></label> <input type="text" id="f-plate" placeholder="例：名古屋 33 あ 1234" oninput="autoFill('f')" autocomplete="off" style="font-size:16px;"> </div> <div class="form-group"> <label>会社名<span class="required">必須</span></label> <input type="text" id="f-company" placeholder="例：〇〇運輸株式会社" style="font-size:16px;"> </div> <div class="form-group"> <label>車種<span class="required">必須</span></label> <select id="f-vehicle" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷役方法<span class="required">必須</span></label> <select id="f-cargo" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷下ろし場所（未定でも可）</label> <select id="f-location" style="font-size:16px;"></select> </div> <div class="form-group" id="f-yokohama-group" style="display:none;"> <label>客先名・案件名（任意）</label> <input type="text" id="f-client" placeholder="例：YKKAP 名古屋向け" style="font-size:16px;"> </div> <div class="form-group"> <label>備考（任意）</label> <input type="text" id="f-note" placeholder="重量物あり、要注意など" style="font-size:16px;"> </div> <button class="submit-btn" onclick="submitForm()" style="font-size:16px;padding:15px;">受付登録する</button> </div> <div class="complete-screen" id="complete-area"> <div class="complete-icon"></div> <div class="complete-num" id="c-num">—</div> <div class="complete-label">番目にご案内します</div> <div class="est-wait" id="c-estwait" style="display:none;"></div> <div class="info-row"><span>会社名</span><strong id="c-company">—</strong></div> <div class="info-row"><span>車両番号</span><strong id="c-plate">—</strong></div> <div class="info-row"><span>車種</span><strong id="c-vehicle">—</strong></div> <div class="info-row"><span>荷役方法</span><strong id="c-cargo">—</strong></div> <div class="info-row"><span>受付時刻</span><strong id="c-time">—</strong></div> <div class="notice-box"> 順番が来ましたらスタッフがお呼びします。そのまま車内でお待ちください。</div> <button class="submit-btn" style="margin-top:12px;font-size:15px;" onclick="resetForm()">別の車両を登録する</button> </div>
+<div id="panel-driver" class="panel content"> <div class="form-container" id="form-area"> <h2> 荷下ろし受付登録（手入力）</h2> <div class="form-desc">ガラケーの方・スキャンできない方はスタッフが代わりに入力します</div> <div class="privacy-note"> 個人情報（名前・電話番号）の入力は不要です</div> <div class="autofill-banner" id="day-autofill-banner"></div> <div class="form-group">
+  <label>車両番号<span class="required">必須</span> <span style="font-size:10px;color:#94A3B8;font-weight:normal;">※入力すると前回情報を自動入力</span></label>
+  <div class="plate-row">
+    <input class="plate-field p-area"  id="f-p1" placeholder="地名" maxlength="4" oninput="plateInput('f','p1')" autocomplete="off">
+    <span class="plate-sep">·</span>
+    <input class="plate-field p-class" id="f-p2" placeholder="330" maxlength="3" inputmode="numeric" oninput="plateInput('f','p2')" autocomplete="off">
+    <span class="plate-sep">·</span>
+    <input class="plate-field p-kana"  id="f-p3" placeholder="あ" maxlength="1" oninput="plateInput('f','p3')" autocomplete="off">
+    <span class="plate-sep">·</span>
+    <input class="plate-field p-num"   id="f-p4" placeholder="1234" maxlength="4" inputmode="numeric" oninput="plateInput('f','p4')" autocomplete="off">
+  </div>
+  <div class="plate-preview" id="f-plate-preview"></div>
+  <input type="hidden" id="f-plate">
+</div>
+<div class="form-group"> <label>会社名<span class="required">必須</span></label> <input type="text" id="f-company" placeholder="例：〇〇運輸株式会社" style="font-size:16px;"> </div> <div class="form-group"> <label>車種<span class="required">必須</span></label> <select id="f-vehicle" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷役方法<span class="required">必須</span></label> <select id="f-cargo" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷下ろし場所（未定でも可）</label> <select id="f-location" style="font-size:16px;"></select> </div> <div class="form-group" id="f-yokohama-group" style="display:none;"> <label>客先名・案件名（任意）</label> <input type="text" id="f-client" placeholder="例：YKKAP 名古屋向け" style="font-size:16px;"> </div> <div class="form-group"> <label>備考（任意）</label> <input type="text" id="f-note" placeholder="重量物あり、要注意など" style="font-size:16px;"> </div> <button class="submit-btn" onclick="submitForm()" style="font-size:16px;padding:15px;">受付登録する</button> </div> <div class="complete-screen" id="complete-area"> <div class="complete-icon"></div> <div class="complete-num" id="c-num">—</div> <div class="complete-label">番目にご案内します</div> <div class="est-wait" id="c-estwait" style="display:none;"></div> <div class="info-row"><span>会社名</span><strong id="c-company">—</strong></div> <div class="info-row"><span>車両番号</span><strong id="c-plate">—</strong></div> <div class="info-row"><span>車種</span><strong id="c-vehicle">—</strong></div> <div class="info-row"><span>荷役方法</span><strong id="c-cargo">—</strong></div> <div class="info-row"><span>受付時刻</span><strong id="c-time">—</strong></div> <div class="notice-box"> 順番が来ましたらスタッフがお呼びします。そのまま車内でお待ちください。</div> <button class="submit-btn" style="margin-top:12px;font-size:15px;" onclick="resetForm()">別の車両を登録する</button> </div>
 </div>
 
 <!-- ========== 集計 ========== -->
@@ -3602,10 +3640,40 @@ function saveToHistory(plate, company, vehicle, cargo) {
   h[plate.replace(/\s/g,'')] = { company:company, vehicle:vehicle, cargo:cargo, updatedAt: new Date().toISOString() };
   try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch(e) {}
 }
-function autoFill(prefix) {
-  var plateVal = document.getElementById(prefix+'-plate').value.replace(/\s/g,'');
+// ===== 車番4分割入力 =====
+function getPlate(prefix) {
+  var p1 = (document.getElementById(prefix+'-p1')||{value:''}).value.trim();
+  var p2 = (document.getElementById(prefix+'-p2')||{value:''}).value.trim();
+  var p3 = (document.getElementById(prefix+'-p3')||{value:''}).value.trim();
+  var p4 = (document.getElementById(prefix+'-p4')||{value:''}).value.trim();
+  var parts = [p1,p2,p3,p4].filter(function(s){return s!=='';});
+  return parts.join(' ');
+}
+
+function plateInput(prefix, field) {
+  var p1El = document.getElementById(prefix+'-p1');
+  var p2El = document.getElementById(prefix+'-p2');
+  var p3El = document.getElementById(prefix+'-p3');
+  var p4El = document.getElementById(prefix+'-p4');
+  // 自動フォーカス移動
+  if(field==='p1' && p1El.value.length >= 3) p2El.focus();
+  if(field==='p2' && p2El.value.length >= 3) p3El.focus();
+  if(field==='p3' && p3El.value.length >= 1) p4El.focus();
+  // hidden に結合値をセット
+  var plateVal = getPlate(prefix).replace(/\s/g,'');
+  var plateDisplay = getPlate(prefix);
+  var hiddenEl = document.getElementById(prefix+'-plate');
+  if(hiddenEl) hiddenEl.value = plateDisplay;
+  // プレビュー表示
+  var prevEl = document.getElementById(prefix+'-plate-preview');
+  if(prevEl) prevEl.textContent = plateDisplay ? '📋 ' + plateDisplay : '';
+  // 自動補完
+  autoFillByPlate(prefix, plateVal);
+}
+
+function autoFillByPlate(prefix, plateVal) {
   var h = getHistory();
-  var banner = document.getElementById(prefix==='f'?'day-autofill-banner':'night-autofill-banner');
+  var bannerEl = document.getElementById(prefix==='f'?'day-autofill-banner':'night-autofill-banner');
   if(plateVal.length >= 3 && h[plateVal]) {
     var d = h[plateVal];
     document.getElementById(prefix+'-company').value = d.company || '';
@@ -3613,11 +3681,18 @@ function autoFill(prefix) {
     var cEl = document.getElementById(prefix+'-cargo');
     for(var i=0;i<vEl.options.length;i++){ if(vEl.options[i].value===d.vehicle) vEl.selectedIndex=i; }
     for(var i=0;i<cEl.options.length;i++){ if(cEl.options[i].value===d.cargo) cEl.selectedIndex=i; }
-    banner.textContent = '✅ 前回登録情報を自動入力しました（'+plateVal+'）';
-    banner.style.display = 'block';
+    bannerEl.textContent = '✅ 前回登録情報を自動入力しました（'+getPlate(prefix)+'）';
+    bannerEl.style.display = 'block';
   } else {
-    banner.style.display = 'none';
+    bannerEl.style.display = 'none';
   }
+}
+
+function autoFill(prefix) {
+  // 旧API互換（hiddenフィールドから値を取得）
+  var hiddenEl = document.getElementById(prefix+'-plate');
+  var plateVal = hiddenEl ? hiddenEl.value.replace(/\s/g,'') : '';
+  autoFillByPlate(prefix, plateVal);
 }
 function renderHistory() {
   var h = getHistory();
@@ -3957,7 +4032,7 @@ function registerVehicle(company,plate,vehicle,cargo,location,note,client,isNigh
 // ===== 昼間フォーム =====
 function submitForm() {
   var company=document.getElementById('f-company').value.trim();
-  var plate=document.getElementById('f-plate').value.trim();
+  var plate=getPlate('f');
   var vehicle=document.getElementById('f-vehicle').value;
   var cargo=document.getElementById('f-cargo').value;
   var location=document.getElementById('f-location').value;
@@ -3982,8 +4057,9 @@ function submitForm() {
   renderAll();
 }
 function resetForm() {
-  ['f-company','f-plate','f-note','f-client'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['f-company','f-note','f-client','f-plate','f-p1','f-p2','f-p3','f-p4'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   ['f-vehicle','f-cargo','f-location'].forEach(function(id){document.getElementById(id).value='';});
+  var pv=document.getElementById('f-plate-preview'); if(pv) pv.textContent='';
   document.getElementById('day-autofill-banner').style.display='none';
   document.getElementById('form-area').style.display='block';
   document.getElementById('complete-area').style.display='none';
@@ -3993,7 +4069,7 @@ function resetForm() {
 function submitNightForm() {
   if(!gpsVerified&&CFG.gpsEnabled){alert('GPS認証が必要です');return;}
   var company=document.getElementById('nf-company').value.trim();
-  var plate=document.getElementById('nf-plate').value.trim();
+  var plate=getPlate('nf');
   var vehicle=document.getElementById('nf-vehicle').value;
   var cargo=document.getElementById('nf-cargo').value;
   var note=document.getElementById('nf-note').value.trim();
@@ -4009,7 +4085,8 @@ function submitNightForm() {
   renderAll();
 }
 function resetNightForm() {
-  ['nf-company','nf-plate','nf-note'].forEach(function(id){document.getElementById(id).value='';});
+  ['nf-company','nf-note','nf-plate','nf-p1','nf-p2','nf-p3','nf-p4'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  var pv=document.getElementById('nf-plate-preview'); if(pv) pv.textContent='';
   ['nf-vehicle','nf-cargo'].forEach(function(id){document.getElementById(id).value='';});
   gpsVerified=false;
   document.getElementById('night-form-area').style.display='none';
