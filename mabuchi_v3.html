@@ -3226,16 +3226,16 @@ input:checked + .slider:before { transform: translateX(20px); }
   <div class="info-row"><span>荷役方法</span><strong id="c-cargo">—</strong></div>
   <div class="info-row"><span>受付時刻</span><strong id="c-time">—</strong></div>
   <div class="notice-box">順番が来ましたらスタッフがお呼びします。そのまま車内でお待ちください。</div>
-  <!-- 複数台登録ボタン（設定ONのときのみ表示） -->
-  <div id="multi-reg-btn-area" style="display:none;margin-top:12px;">
-    <button class="submit-btn" style="font-size:15px;background:#1E3A5F;" onclick="addAnotherVehicle()">もう1台登録する</button>
+  <!-- 続けて入力するボタン（常時表示） -->
+  <div id="multi-reg-btn-area" style="margin-top:12px;">
+    <button class="submit-btn" style="font-size:15px;background:#1E3A5F;" onclick="addAnotherVehicle()">続けて入力する</button>
   </div>
-  <!-- このセッションで登録した車両の一覧（複数台登録ONかつ2台以上のとき） -->
+  <!-- このセッションで登録した車両の一覧 -->
   <div id="session-list-area" style="display:none;margin-top:16px;">
     <div style="font-size:13px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #EFF6FF;">このQRで登録した車両</div>
     <div id="session-list-cards"></div>
   </div>
-  <button class="submit-btn" style="margin-top:12px;font-size:15px;background:#64748B;" onclick="resetFormFull()">✖ 受付を終了する</button>
+  <button class="submit-btn" style="margin-top:12px;font-size:15px;background:#64748B;" onclick="resetFormFull()">受付を終了する</button>
 </div>
 </div>
 
@@ -3289,7 +3289,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <input type="number" id="cfg-warn-min" class="setting-input" value="30" min="5" max="120" onchange="saveCfg()">
     </div>
     <div class="setting-row">
-      <div><div class="setting-label">🚛 複数台連続登録</div><div class="setting-sub">ONにすると受付完了後に「もう1台登録する」ボタンを表示。同一セッションで登録した全車両の待ち状況を一覧表示します（横浜工場等、複数台同時受付に対応）</div></div>
+      <div><div class="setting-label">複数台連続登録</div><div class="setting-sub">この設定は廃止されました。「続けて入力する」ボタンは常に表示されます。</div></div>
       <label class="toggle"><input type="checkbox" id="cfg-multi-reg" onchange="saveCfg()"><span class="slider"></span></label>
     </div>
   </div>
@@ -4409,16 +4409,11 @@ function submitForm() {
   var estEl=document.getElementById('c-estwait');
   if(CFG.estWaitEnabled){estEl.textContent='推定待ち時間：約'+estMin+'分';estEl.style.display='inline-block';}
   else{estEl.style.display='none';}
-  // 複数台登録ボタン表示
-  var mBtn=document.getElementById('multi-reg-btn-area');
-  if(mBtn) mBtn.style.display = CFG.multiRegEnabled ? '' : 'none';
   // セッション一覧を更新
   renderSessionList();
   // リアルタイム更新（10秒ごと）
   if(sessionListTimer) clearInterval(sessionListTimer);
-  if(CFG.multiRegEnabled) {
-    sessionListTimer = setInterval(renderSessionList, 10000);
-  }
+  sessionListTimer = setInterval(renderSessionList, 10000);
   renderAll();
 }
 
@@ -4449,7 +4444,7 @@ function resetForm() {
 }
 
 function renderSessionList() {
-  if(!CFG.multiRegEnabled || sessionRegistrations.length < 1) {
+  if(sessionRegistrations.length < 1) {
     var la=document.getElementById('session-list-area'); if(la) la.style.display='none';
     return;
   }
@@ -4574,6 +4569,21 @@ function setSort(s) {
       }
       mainEl.innerHTML=html;
     }
+    // 完了カードも再描画（ソート切り替えに追従）
+    var doneEl2=document.getElementById('done-list');
+    if(doneEl2) {
+      var done2=vehicles.filter(function(v){return v.status==='done';});
+      var doneCount2=document.getElementById('done-count');
+      if(doneCount2) doneCount2.textContent = done2.length ? '（'+done2.length+'台）' : '';
+      if(!done2.length){
+        doneEl2.innerHTML='<div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div>';
+      } else if(currentSort==='location') {
+        doneEl2.innerHTML = groupByLocation(done2, makeDoneCard);
+      } else {
+        var sd=done2.slice().sort(function(a,b){return b.id-a.id;});
+        doneEl2.innerHTML = sd.map(makeDoneCard).join('');
+      }
+    }
   } else {
     // 過去/未来日付を表示中の場合は renderListForDate を直接呼ぶ
     if(viewDateListener) {
@@ -4674,6 +4684,13 @@ function makeDoneCard(v, showEditBtn) {
     }).join('');
     editLogHtml = '<div style="margin-top:4px;">' + logItems + '</div>';
   }
+  var actions = '';
+  if(showEditBtn !== false) {
+    actions = '<div class="card-actions" style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;">'
+      +'<button class="btn btn-reorder" onclick="openEditWaitModal('+v.id+')" style="font-size:11px;padding:4px 8px;">時間修正</button>'
+      +'<button class="btn" onclick="uncompleteVehicle('+v.id+')" style="font-size:11px;padding:4px 8px;background:#F8FAFC;color:#64748B;border:1px solid #CBD5E1;">元に戻す</button>'
+      +'</div>';
+  }
   return '<div class="waiting-card" style="opacity:0.65;border-left:4px solid #028090;">'
     +'<div class="num-badge" style="background:#028090;">完</div>'
     +'<div class="card-info" style="flex:1;">'
@@ -4688,10 +4705,17 @@ function makeDoneCard(v, showEditBtn) {
       +'<div class="card-time">受付 '+v.timeStr+'　車番：'+v.plate+(v.waitMin!==null?'　<span style="color:#028090;font-weight:bold;">待ち'+v.waitMin+'分</span>':'')+(v.note?'　備考：'+v.note:'')+'</div>'
       +editLogHtml
     +'</div>'
-    +(showEditBtn!==false
-      ?'<div class="card-actions"><button class="btn btn-reorder" onclick="openEditWaitModal('+v.id+')" style="font-size:11px;padding:4px 8px;">時間修正</button></div>'
-      :'')
+    +actions
   +'</div>';
+}
+
+function uncompleteVehicle(id) {
+  var v = vehicles.find(function(x){return x.id===id;});
+  if(!v) return;
+  if(!confirm(v.company + ' の完了を取り消して待機中に戻しますか？')) return;
+  fbUpdateEntry(id, {status:'waiting', waitMin:-1});
+  v.status='waiting'; v.waitMin=null;
+  renderAll();
 }
 
 // ===== 実効待機時間計算 =====
@@ -4832,17 +4856,21 @@ function renderAll() {
     if(!done.length){
       if(doneEl) doneEl.innerHTML='<div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div>';
     } else {
-      // 完了は受付時刻の逆順（最新を上）
-      var sortedDone = done.slice().sort(function(a,b){return b.id-a.id;});
-      if(doneEl) doneEl.innerHTML = sortedDone.map(makeDoneCard).join('');
+      if(currentSort==='location') {
+        if(doneEl) doneEl.innerHTML = groupByLocation(done, makeDoneCard);
+      } else {
+        // 受付順（逆順：最新を上）
+        var sortedDone = done.slice().sort(function(a,b){return b.id-a.id;});
+        if(doneEl) doneEl.innerHTML = sortedDone.map(makeDoneCard).join('');
+      }
     }
   }
 
   // 集計パネルは期間指定モードで別途管理するため、renderAll()からは更新しない
   // （renderStatsPanel() が担当）
 
-  // 複数台登録セッション一覧をリアルタイム更新
-  if(CFG.multiRegEnabled && sessionRegistrations.length >= 1) {
+  // セッション一覧をリアルタイム更新
+  if(sessionRegistrations.length >= 1) {
     renderSessionList();
   }
 }
@@ -4953,13 +4981,17 @@ function renderListForDate(list) {
     wHtml = groupByLocation(waiting, makeViewCard);
   }
   if(mainEl) mainEl.innerHTML = wHtml || '<div class="empty-state"><div class="empty-icon"></div><div>待機中のまま終了した車両はありません</div></div>';
-  // 完了カラム（受付時刻の逆順、ボタンなし）
+  // 完了カラム（ボタンなし、ソート設定に従う）
   if(doneCount) doneCount.textContent = done.length ? '（'+done.length+'台）' : '';
   if(!done.length) {
     if(doneEl) doneEl.innerHTML = '<div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div>';
   } else {
-    var sortedDone = done.slice().sort(function(a,b){return b.id-a.id;});
-    if(doneEl) doneEl.innerHTML = sortedDone.map(function(v){return makeDoneCard(v,false);}).join('');
+    if(currentSort==='location') {
+      if(doneEl) doneEl.innerHTML = groupByLocation(done, function(v){ return makeDoneCard(v,false); });
+    } else {
+      var sortedDone = done.slice().sort(function(a,b){return b.id-a.id;});
+      if(doneEl) doneEl.innerHTML = sortedDone.map(function(v){return makeDoneCard(v,false);}).join('');
+    }
   }
 }
 
