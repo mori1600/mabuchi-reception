@@ -3910,9 +3910,17 @@ var plateHistoryCache = {};
 function getHistory() {
   return plateHistoryCache;
 }
+function normalizePlateKey(plate) {
+  // 全スペース除去 + 全角→半角数字変換 + 全角スペース除去
+  return plate
+    .replace(/[\s　]/g, '')                          // 半角・全角スペース除去
+    .replace(/[０-９]/g, function(c){ return String.fromCharCode(c.charCodeAt(0)-0xFEE0); }) // 全角数字→半角
+    .toUpperCase();                                  // アルファベットを大文字統一
+}
 function saveToHistory(plate, company, vehicle, cargo) {
   if(!plate) return;
-  var key = plate.replace(/\s/g,'');
+  var key = normalizePlateKey(plate);
+  if(!key) return;
   var entry = { company:company, vehicle:vehicle, cargo:cargo, updatedAt: new Date().toISOString() };
   plateHistoryCache[key] = entry;
   // Firebaseに保存（全端末に即反映）
@@ -3923,7 +3931,15 @@ function saveToHistory(plate, company, vehicle, cargo) {
 function startHistoryListener() {
   fbDB.ref('plate_history').on('value', function(snapshot) {
     var d = snapshot.val();
-    plateHistoryCache = d || {};
+    // キーを正規化してキャッシュに格納（過去データの全角・スペース対応）
+    var normalized = {};
+    if(d) {
+      Object.keys(d).forEach(function(k) {
+        var nk = normalizePlateKey(k);
+        if(nk) normalized[nk] = d[k];
+      });
+    }
+    plateHistoryCache = normalized;
     // localStorageにバックアップ
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify(plateHistoryCache)); } catch(e) {}
     renderHistory();
@@ -3932,7 +3948,13 @@ function startHistoryListener() {
   try {
     var local = JSON.parse(localStorage.getItem(HISTORY_KEY)||'{}');
     if(Object.keys(local).length > 0 && Object.keys(plateHistoryCache).length === 0) {
-      plateHistoryCache = local;
+      // localStorageのキーも正規化
+      var normalizedLocal = {};
+      Object.keys(local).forEach(function(k) {
+        var nk = normalizePlateKey(k);
+        if(nk) normalizedLocal[nk] = local[k];
+      });
+      plateHistoryCache = normalizedLocal;
     }
   } catch(e) {}
 }
@@ -3983,12 +4005,12 @@ function plateMoveFocus(prefix, field) {
 
 function plateUpdateHidden(prefix) {
   var plateDisplay = getPlate(prefix);
-  var plateVal = plateDisplay.replace(/\s/g,'');
+  var plateKey = normalizePlateKey(plateDisplay);
   var hiddenEl = document.getElementById(prefix+'-plate');
   if(hiddenEl) hiddenEl.value = plateDisplay;
   var prevEl = document.getElementById(prefix+'-plate-preview');
   if(prevEl) prevEl.textContent = plateDisplay ? plateDisplay : '';
-  autoFillByPlate(prefix, plateVal);
+  autoFillByPlate(prefix, plateKey);
 }
 
 function plateInput(prefix, field) {
@@ -4007,11 +4029,12 @@ function plateKeydown(prefix, field, event) {
   if(event.isComposing) return; // 変換中は無視
 }
 
-function autoFillByPlate(prefix, plateVal) {
+function autoFillByPlate(prefix, plateKey) {
   var h = getHistory();
+  var normalizedKey = normalizePlateKey(plateKey);
   var bannerEl = document.getElementById(prefix==='f'?'day-autofill-banner':'night-autofill-banner');
-  if(plateVal.length >= 3 && h[plateVal]) {
-    var d = h[plateVal];
+  if(normalizedKey.length >= 3 && h[normalizedKey]) {
+    var d = h[normalizedKey];
     document.getElementById(prefix+'-company').value = d.company || '';
     var vEl = document.getElementById(prefix+'-vehicle');
     var cEl = document.getElementById(prefix+'-cargo');
@@ -4027,7 +4050,7 @@ function autoFillByPlate(prefix, plateVal) {
 function autoFill(prefix) {
   // 旧API互換（hiddenフィールドから値を取得）
   var hiddenEl = document.getElementById(prefix+'-plate');
-  var plateVal = hiddenEl ? hiddenEl.value.replace(/\s/g,'') : '';
+  var plateVal = hiddenEl ? normalizePlateKey(hiddenEl.value) : '';
   autoFillByPlate(prefix, plateVal);
 }
 function renderHistory() {
@@ -4227,6 +4250,8 @@ function startFirebaseListener() {
         timeStr: d.timeStr,
         status: d.status,
         waitMin: d.waitMin >= 0 ? d.waitMin : null,
+        doneTimeMs: d.doneTimeMs || null,
+        doneTimeStr: d.doneTimeStr || '',
         editLog: Array.isArray(d.editLog) ? d.editLog : (d.editLog ? Object.values(d.editLog) : []),
         reason: (d.reason && d.reason !== '__clear__') ? d.reason : ''
       };
@@ -4507,11 +4532,14 @@ function resetNightForm() {
 function completeVehicle(id) {
   var v=vehicles.find(function(x){return x.id===id;});
   if(!v)return;
-  var waitMin=calcEffectiveWait(v.time, new Date());
+  var now = new Date();
+  var waitMin=calcEffectiveWait(v.time, now);
+  var doneTimeMs = now.getTime();
+  var doneTimeStr = ('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2);
   // Firebase更新（リスナーが全端末に反映）
-  fbUpdateEntry(id, {status:'done', waitMin:waitMin});
+  fbUpdateEntry(id, {status:'done', waitMin:waitMin, doneTimeMs:doneTimeMs, doneTimeStr:doneTimeStr});
   // ローカルも即時反映（UX向上）
-  v.status='done'; v.waitMin=waitMin;
+  v.status='done'; v.waitMin=waitMin; v.doneTimeMs=doneTimeMs; v.doneTimeStr=doneTimeStr;
   renderAll();
 }
 function setLocation(id,val) {
@@ -4598,6 +4626,7 @@ function setSort(s) {
             note: d.note||'', client: d.client||'', isNight: d.isNight||false,
             time: new Date(d.timeMs), timeStr: d.timeStr,
             status: d.status, waitMin: d.waitMin>=0?d.waitMin:null,
+            doneTimeMs: d.doneTimeMs||null, doneTimeStr: d.doneTimeStr||'',
             editLog: Array.isArray(d.editLog)?d.editLog:(d.editLog?Object.values(d.editLog):[]),
             reason: (d.reason&&d.reason!=='__clear__')?d.reason:''
           });
@@ -4702,7 +4731,7 @@ function makeDoneCard(v, showEditBtn) {
         +(v.isNight?'<span class="tag night-t">夜間</span>':'')
       +'</div>'
       +(v.client?'<div style="font-size:10px;color:#028090;margin-top:2px;">'+v.client+'</div>':'')
-      +'<div class="card-time">受付 '+v.timeStr+'　車番：'+v.plate+(v.waitMin!==null?'　<span style="color:#028090;font-weight:bold;">待ち'+v.waitMin+'分</span>':'')+(v.note?'　備考：'+v.note:'')+'</div>'
+      +'<div class="card-time">受付 '+v.timeStr+(v.doneTimeStr?'　完了 '+v.doneTimeStr:'')+'　車番：'+v.plate+(v.waitMin!==null?'　<span style="color:#028090;font-weight:bold;">待ち'+v.waitMin+'分</span>':'')+(v.note?'　備考：'+v.note:'')+'</div>'
       +editLogHtml
     +'</div>'
     +actions
@@ -4713,8 +4742,8 @@ function uncompleteVehicle(id) {
   var v = vehicles.find(function(x){return x.id===id;});
   if(!v) return;
   if(!confirm(v.company + ' の完了を取り消して待機中に戻しますか？')) return;
-  fbUpdateEntry(id, {status:'waiting', waitMin:-1});
-  v.status='waiting'; v.waitMin=null;
+  fbUpdateEntry(id, {status:'waiting', waitMin:-1, doneTimeMs:null, doneTimeStr:''});
+  v.status='waiting'; v.waitMin=null; v.doneTimeMs=null; v.doneTimeStr='';
   renderAll();
 }
 
@@ -4931,6 +4960,7 @@ function switchViewDateListener() {
         note: d.note||'', client: d.client||'', isNight: d.isNight||false,
         time: new Date(d.timeMs), timeStr: d.timeStr,
         status: d.status, waitMin: d.waitMin>=0?d.waitMin:null,
+        doneTimeMs: d.doneTimeMs||null, doneTimeStr: d.doneTimeStr||'',
         editLog: Array.isArray(d.editLog) ? d.editLog : (d.editLog ? Object.values(d.editLog) : []),
         reason: (d.reason&&d.reason!=='__clear__')?d.reason:''
       };
@@ -5094,9 +5124,9 @@ function clearViewDateData() {
 // ===== CSV（今日分） =====
 function downloadCSV() {
   if(!vehicles.length){alert('データがありません');return;}
-  var h=['受付番号','会社名','車両番号','車種','荷役方法','受付時刻','ステータス','待ち時間(分)','荷下ろし場所','夜間受付','調整理由','客先名','備考'];
+  var h=['受付番号','会社名','車両番号','車種','荷役方法','受付時刻','完了時刻','ステータス','待ち時間(分)','荷下ろし場所','夜間受付','調整理由','客先名','備考'];
   var rows=vehicles.map(function(v){
-    return [v.id,v.company,v.plate,v.vehicle,v.cargo,v.timeStr,v.status==='done'?'完了':'待機中',v.waitMin!==null?v.waitMin:'',v.location,v.isNight?'夜間':'通常',v.reason,v.client||'',v.note];
+    return [v.id,v.company,v.plate,v.vehicle,v.cargo,v.timeStr,v.doneTimeStr||'',v.status==='done'?'完了':'待機中',v.waitMin!==null?v.waitMin:'',v.location,v.isNight?'夜間':'通常',v.reason,v.client||'',v.note];
   });
   var csv=[h].concat(rows).map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
   var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
@@ -5166,7 +5196,9 @@ function loadStatsForRange() {
           vehicle: d.vehicle||'', cargo: d.cargo||'', location: d.location||'',
           note: d.note||'', client: d.client||'', isNight: d.isNight||false,
           timeStr: d.timeStr||'', status: d.status||'waiting',
-          waitMin: d.waitMin>=0?Number(d.waitMin):null, dayKey: dayKey
+          waitMin: d.waitMin>=0?Number(d.waitMin):null,
+          doneTimeMs: d.doneTimeMs||null, doneTimeStr: d.doneTimeStr||'',
+          dayKey: dayKey
         });
       });
     });
@@ -5209,9 +5241,9 @@ function renderStatsPanel(list) {
 function downloadCSVRange() {
   var list = statsAllVehicles.length ? statsAllVehicles : vehicles;
   if(!list.length){alert('データがありません');return;}
-  var h=['日付','受付番号','会社名','車両番号','車種','荷役方法','受付時刻','ステータス','待ち時間(分)','荷下ろし場所','夜間受付','調整理由','客先名','備考'];
+  var h=['日付','受付番号','会社名','車両番号','車種','荷役方法','受付時刻','完了時刻','ステータス','待ち時間(分)','荷下ろし場所','夜間受付','調整理由','客先名','備考'];
   var rows=list.map(function(v){
-    return [v.dayKey||'',v.id,v.company,v.plate,v.vehicle,v.cargo,v.timeStr,v.status==='done'?'完了':'待機中',v.waitMin!==null?v.waitMin:'',v.location,v.isNight?'夜間':'通常',v.reason||'',v.client||'',v.note||''];
+    return [v.dayKey||'',v.id,v.company,v.plate,v.vehicle,v.cargo,v.timeStr,v.doneTimeStr||'',v.status==='done'?'完了':'待機中',v.waitMin!==null?v.waitMin:'',v.location,v.isNight?'夜間':'通常',v.reason||'',v.client||'',v.note||''];
   });
   var csv=[h].concat(rows).map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
   var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
