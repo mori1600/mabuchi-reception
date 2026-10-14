@@ -4004,7 +4004,7 @@ function startFirebaseListener() {
     Object.keys(data).forEach(function(k) {
       var d = data[k];
       var e = {
-        id: d.id,
+        id: Number(d.id),
         company: d.company,
         plate: d.plate,
         vehicle: d.vehicle,
@@ -4017,7 +4017,7 @@ function startFirebaseListener() {
         timeStr: d.timeStr,
         status: d.status,
         waitMin: d.waitMin >= 0 ? d.waitMin : null,
-        reason: d.reason || ''
+        reason: (d.reason && d.reason !== '__clear__') ? d.reason : ''
       };
       list.push(e);
     });
@@ -4251,17 +4251,24 @@ function setLocation(id,val) {
   v.location=val;renderAll();
 }
 function openModal(id) {
-  modalTargetId=id;
-  var v=vehicles.find(function(x){return x.id===id;});
+  modalTargetId=Number(id); // 必ず数値型で保持
+  var v=vehicles.find(function(x){return Number(x.id)===Number(id);});
   document.getElementById('reason-input').value=v?v.reason:'';
   document.getElementById('reorder-modal').classList.add('show');
 }
 function closeModal() { document.getElementById('reorder-modal').classList.remove('show'); modalTargetId=null; }
 function saveReason() {
-  var v=vehicles.find(function(x){return x.id===modalTargetId;});
+  // IDの型を統一して比較（FirebaseからはStringで来る場合がある）
+  var v=vehicles.find(function(x){return String(x.id)===String(modalTargetId);});
   if(v){
     var reason=document.getElementById('reason-input').value.trim();
-    fbUpdateEntry(v.id, {reason:reason});
+    // Firebaseは空文字列をnullとして扱うため、空の場合は半角スペースで代替しない
+    // reasonが空のときはフィールドを明示的に消去
+    if(reason===''){
+      fbUpdateEntry(v.id, {reason: '__clear__'});
+    } else {
+      fbUpdateEntry(v.id, {reason: reason});
+    }
     v.reason=reason;
   }
   closeModal(); renderAll();
@@ -4340,17 +4347,17 @@ function renderAll() {
   if(!waiting.length){
     miniEl.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div><div>現在待機中の車両はありません</div></div>';
   } else {
-    miniEl.innerHTML=waiting.slice(0,3).map(function(v,i){
+    miniEl.innerHTML=waiting.map(function(v,i){
       return '<div class="waiting-card '+(v.isNight?'night-reg':'')+'">'
         +'<div class="num-badge '+(v.isNight?'night':'')+'">'+( i+1)+'</div>'
         +'<div class="card-info">'
-          +'<div class="card-company">'+v.company+'</div>'
+          +'<div class="card-company">'+(i+1)+'番目の方</div>'
           +'<div class="card-detail"><span class="tag">'+v.vehicle+'</span>'+cargoTag(v.cargo)+(v.location?'<span class="tag loc">📍'+v.location+'</span>':'')+'</div>'
-          +(v.reason?'<div class="wait-reason">📢 '+v.reason+'</div>':'')
-          +'<div class="card-time">受付 '+v.timeStr+'　車番：'+v.plate+'</div>'
+          +(v.reason?'<div class="wait-reason" style="font-size:15px;padding:6px 12px;font-weight:bold;">📢 '+v.reason+'</div>':'')
+          +'<div class="card-time">受付 '+v.timeStr+'</div>'
         +'</div>'
       +'</div>';
-    }).join('')+(waiting.length>3?'<div style="text-align:center;font-size:11px;color:#64748B;padding:6px;">他 '+(waiting.length-3)+' 台待機中</div>':'');
+    }).join('');
   }
 
   var mainEl=document.getElementById('main-list');
