@@ -4553,9 +4553,58 @@ document.getElementById('reorder-modal').addEventListener('click',function(e){if
 // ===== ソート =====
 function setSort(s) {
   currentSort=s;
-  document.querySelectorAll('.sort-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('sort-'+s).classList.add('active');
-  renderAll();
+  // ソートボタンのみアクティブ切り替え（集計ボタンには触れない）
+  ['arrival','location'].forEach(function(k){
+    var btn=document.getElementById('sort-'+k);
+    if(btn){ if(k===s){btn.classList.add('active');}else{btn.classList.remove('active');} }
+  });
+  // 今日の日付のとき：vehiclesから直接描画
+  if(isToday(viewDate)) {
+    var mainEl=document.getElementById('main-list');
+    if(!mainEl) return;
+    var waiting=vehicles.filter(function(v){return v.status==='waiting';});
+    if(!waiting.length){
+      mainEl.innerHTML='<div class="empty-state"><div class="empty-icon"></div><div>現在待機中の車両はありません</div></div>';
+    } else {
+      var html='';
+      if(currentSort==='arrival'){
+        waiting.forEach(function(v,i){html+=makeCard(v,i+1);});
+      } else {
+        var groups={};
+        waiting.forEach(function(v){var k=v.location||'未定';if(!groups[k])groups[k]=[];groups[k].push(v);});
+        var pos=1;
+        var order=CFG.locations.concat(['未定']);
+        order.forEach(function(key){
+          if(groups[key]){html+='<div class="group-header">'+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){html+=makeCard(v,pos++);});}
+        });
+      }
+      mainEl.innerHTML=html;
+    }
+  } else {
+    // 過去/未来日付を表示中の場合は renderListForDate を直接呼ぶ
+    if(viewDateListener) {
+      viewDateListener.once('value', function(snapshot) {
+        var data = snapshot.val() || {};
+        var list = [];
+        Object.keys(data).forEach(function(k) {
+          var d = data[k];
+          list.push({
+            id: Number(d.id), company: d.company, plate: d.plate,
+            vehicle: d.vehicle, cargo: d.cargo, location: d.location||'',
+            note: d.note||'', client: d.client||'', isNight: d.isNight||false,
+            time: new Date(d.timeMs), timeStr: d.timeStr,
+            status: d.status, waitMin: d.waitMin>=0?d.waitMin:null,
+            editLog: Array.isArray(d.editLog)?d.editLog:(d.editLog?Object.values(d.editLog):[]),
+            reason: (d.reason&&d.reason!=='__clear__')?d.reason:''
+          });
+        });
+        list.sort(function(a,b){return a.id-b.id;});
+        renderListForDate(list);
+      });
+    } else {
+      renderAll();
+    }
+  }
 }
 
 // ===== タグ生成 =====
