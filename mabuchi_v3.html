@@ -3132,7 +3132,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 </head>
 <body>
 
-<div class="header"> <div> <div class="header-title" id="hdr-factory">マブチ 荷下ろし受付</div> <div class="header-subtitle">個人情報ゼロ設計</div> </div> <div class="header-right"> <div class="clock" id="header-clock">--:--</div> <div class="badge" id="header-badge">クラウド版</div> <div id="fb-status" style="font-size:10px;color:#94A3B8;margin-top:2px;">🔄 接続中...</div> </div>
+<div class="header"> <div> <div class="header-title" id="hdr-factory">マブチ 荷下ろし受付</div> <div class="header-subtitle">個人情報ゼロ設計</div> </div> <div class="header-right"> <div class="clock" id="header-clock">--:--</div> <div class="badge" id="header-badge">クラウド版</div> <div id="fb-status" style="font-size:10px;color:#94A3B8;margin-top:2px;">接続中...</div> </div>
 </div>
 
 <div class="tabs">
@@ -3184,17 +3184,17 @@ input:checked + .slider:before { transform: translateX(20px); }
   <div class="list-columns" style="display:flex;gap:10px;align-items:flex-start;">
     <!-- 左：待機中 -->
     <div style="flex:1;min-width:0;">
-      <div style="font-size:12px;font-weight:bold;color:#1E3A5F;padding:6px 8px;background:#EFF6FF;border-radius:8px 8px 0 0;border-left:4px solid #1E3A5F;">🚛 待機中</div>
+      <div style="font-size:12px;font-weight:bold;color:#1E3A5F;padding:6px 8px;background:#EFF6FF;border-radius:8px 8px 0 0;border-left:4px solid #1E3A5F;">待機中</div>
       <div id="main-list"><div class="empty-state"><div class="empty-icon"></div><div>現在待機中の車両はありません</div></div></div>
     </div>
     <!-- 右：完了済み -->
     <div style="flex:1;min-width:0;">
-      <div style="font-size:12px;font-weight:bold;color:#028090;padding:6px 8px;background:#F0FDFA;border-radius:8px 8px 0 0;border-left:4px solid #028090;">✅ 完了済み <span id="done-count" style="font-size:11px;font-weight:normal;color:#94A3B8;"></span></div>
+      <div style="font-size:12px;font-weight:bold;color:#028090;padding:6px 8px;background:#F0FDFA;border-radius:8px 8px 0 0;border-left:4px solid #028090;">完了済み <span id="done-count" style="font-size:11px;font-weight:normal;color:#94A3B8;"></span></div>
       <div id="done-list"><div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div></div>
     </div>
   </div>
 <div style="text-align:right;padding:8px 0 4px;">
-  <button onclick="clearViewDateData()" style="font-size:11px;padding:5px 10px;background:#C0392B;color:#fff;border:none;border-radius:6px;cursor:pointer;">🗑 表示中の日付のデータをリセット</button>
+  <button onclick="clearViewDateData()" style="font-size:11px;padding:5px 10px;background:#C0392B;color:#fff;border:none;border-radius:6px;cursor:pointer;">表示中の日付のデータをリセット</button>
 </div>
 </div>
 
@@ -3228,11 +3228,11 @@ input:checked + .slider:before { transform: translateX(20px); }
   <div class="notice-box">順番が来ましたらスタッフがお呼びします。そのまま車内でお待ちください。</div>
   <!-- 複数台登録ボタン（設定ONのときのみ表示） -->
   <div id="multi-reg-btn-area" style="display:none;margin-top:12px;">
-    <button class="submit-btn" style="font-size:15px;background:#1E3A5F;" onclick="addAnotherVehicle()">🚛 もう1台登録する</button>
+    <button class="submit-btn" style="font-size:15px;background:#1E3A5F;" onclick="addAnotherVehicle()">もう1台登録する</button>
   </div>
   <!-- このセッションで登録した車両の一覧（複数台登録ONかつ2台以上のとき） -->
   <div id="session-list-area" style="display:none;margin-top:16px;">
-    <div style="font-size:13px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #EFF6FF;">📋 このQRで登録した車両</div>
+    <div style="font-size:13px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #EFF6FF;">このQRで登録した車両</div>
     <div id="session-list-cards"></div>
   </div>
   <button class="submit-btn" style="margin-top:12px;font-size:15px;background:#64748B;" onclick="resetFormFull()">✖ 受付を終了する</button>
@@ -3243,7 +3243,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 <div id="panel-stats" class="panel content">
   <!-- 期間指定UI -->
   <div style="background:#f0f4f8;border-radius:10px;padding:10px 12px;margin-bottom:12px;">
-    <div style="font-size:13px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;">📅 集計期間</div>
+    <div style="font-size:13px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;">集計期間</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
       <button class="sort-btn active" id="stats-range-month" onclick="setStatsRange('month')">今月</button>
       <button class="sort-btn" id="stats-range-week"  onclick="setStatsRange('week')">今週</button>
@@ -3257,7 +3257,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <button onclick="applyCustomRange()" style="background:#028090;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;">集計</button>
     </div>
     <div id="stats-range-label" style="font-size:12px;color:#64748B;margin-top:4px;"></div>
-    <div id="stats-loading" style="font-size:12px;color:#94A3B8;margin-top:4px;display:none;">📊 集計中...</div>
+    <div id="stats-loading" style="font-size:12px;color:#94A3B8;margin-top:4px;display:none;">集計中...</div>
   </div>
   <div class="stats-grid g4" style="margin-bottom:10px;"> <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">総受付台数</div></div> <div class="stat-card"><div class="stat-num" id="s-done">0</div><div class="stat-label">完了台数</div></div> <div class="stat-card"><div class="stat-num" id="s-avg">—</div><div class="stat-label">平均待ち時間(分)</div></div> <div class="stat-card"><div class="stat-num" id="s-max">—</div><div class="stat-label">最長待ち時間(分)</div></div> </div> <div class="stats-grid g4" style="margin-bottom:12px;"> <div class="stat-card"><div class="stat-num" id="s-night">0</div><div class="stat-label">夜間受付台数</div></div> <div class="stat-card"><div class="stat-num red" id="s-over">0</div><div class="stat-label" id="s-over-label">30分超え件数</div></div> </div> <div class="card" style="margin-bottom:8px;"> <div style="font-size:12px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;">荷役方法別 台数</div> <div id="cargo-stats"><div style="font-size:11px;color:#94A3B8;">データなし</div></div> </div> <div class="card" style="margin-bottom:8px;"> <div style="font-size:12px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;">車種別 台数</div> <div id="vehicle-stats"><div style="font-size:11px;color:#94A3B8;">データなし</div></div> </div> <button class="csv-btn" onclick="downloadCSVRange()"> CSVダウンロード（物流効率化法対応）</button> <div style="font-size:10px;color:#94A3B8;text-align:center;margin-top:5px;">荷待ち時間記録データとして国交省報告に活用可能</div>
 </div>
@@ -3354,7 +3354,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="setting-label" style="margin-bottom:4px;">工場座標の設定</div>
       <input type="text" id="cfg-address" class="setting-input-wide" placeholder="例：愛知県弥富市楠3-9-1">
       <div style="margin-top:6px;display:flex;gap:6px;">
-        <button class="setting-btn sub" onclick="geocodeAddress()">📍 住所から座標を取得</button>
+        <button class="setting-btn sub" onclick="geocodeAddress()">住所から座標を取得</button>
         <button class="setting-btn" onclick="useCurrentGPS()">現在地を使用</button>
       </div>
       <div id="geo-result" class="geo-result" style="display:none;"></div>
@@ -3490,8 +3490,8 @@ input:checked + .slider:before { transform: translateX(20px); }
             </select>
           </div>
           <div style="margin-top:10px;display:flex;gap:6px;">
-            <button class="setting-btn sub" onclick="testApiConnection()">🔌 接続テスト</button>
-            <button class="setting-btn green" onclick="showApiSchema()">📄 送信データ確認</button>
+            <button class="setting-btn sub" onclick="testApiConnection()">接続テスト</button>
+            <button class="setting-btn green" onclick="showApiSchema()">送信データ確認</button>
           </div>
           <div id="api-test-result" class="geo-result" style="display:none;margin-top:6px;"></div>
         </div>
@@ -3506,10 +3506,39 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 </div>
 
+<!-- 完了時間修正モーダル -->
+<div class="modal-overlay" id="edit-wait-modal">
+  <div class="modal">
+    <h3>完了時間の修正</h3>
+    <div style="font-size:11px;color:#64748B;margin-bottom:12px;">完了ボタン押し忘れなど、待機時間を後から修正できます。修正理由は記録に残ります。</div>
+    <div id="edit-wait-vehicle-info" style="background:#f0f4f8;border-radius:8px;padding:8px 10px;margin-bottom:12px;font-size:12px;color:#1E3A5F;"></div>
+    <div style="margin-bottom:10px;">
+      <label style="font-size:12px;font-weight:bold;color:#475569;display:block;margin-bottom:4px;">待機時間（分）</label>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="number" id="edit-wait-min" min="0" max="600"
+          style="width:90px;font-size:20px;font-weight:bold;text-align:center;padding:8px;border:2px solid #CBD5E1;border-radius:8px;">
+        <span style="font-size:14px;color:#64748B;">分</span>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:12px;font-weight:bold;color:#475569;display:block;margin-bottom:4px;">修正理由 <span style="color:#C0392B;">必須</span></label>
+      <textarea id="edit-wait-reason" placeholder="例：完了ボタン押し忘れ、実際は12:30に終了" style="width:100%;min-height:60px;font-size:13px;padding:8px;border:1px solid #CBD5E1;border-radius:8px;box-sizing:border-box;resize:vertical;"></textarea>
+    </div>
+    <div id="edit-wait-log" style="display:none;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:bold;color:#94A3B8;margin-bottom:4px;">修正履歴</div>
+      <div id="edit-wait-log-body" style="font-size:11px;color:#64748B;background:#f8fafc;border-radius:6px;padding:6px 8px;max-height:80px;overflow-y:auto;"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEditWaitModal()">キャンセル</button>
+      <button class="btn-save" onclick="saveEditWait()">保存する</button>
+    </div>
+  </div>
+</div>
+
 <!-- 順番調整モーダル -->
 <div class="modal-overlay" id="reorder-modal">
   <div class="modal">
-    <h3>📋 順番調整・待機理由の入力</h3>
+    <h3>順番調整・待機理由の入力</h3>
     <div style="font-size:11px;color:#64748B;margin-bottom:8px;">入力した理由はドライバーの待機画面にも表示されます（クレーム防止）</div>
     <textarea id="reason-input" placeholder="例：現在クレーン作業中のため少々お待ちください"></textarea>
     <div class="modal-btns">
@@ -3778,7 +3807,7 @@ var apiLogs = [];
 function sendToApi(entry) {
   if(!CFG.apiEnabled) return;
   if(!CFG.apiUrl) {
-    addApiLog('⚠️ APIのURLが設定されていません');
+    addApiLog('APIのURLが設定されていません');
     return;
   }
 
@@ -3800,7 +3829,7 @@ function sendToApi(entry) {
   var headers = { 'Content-Type': 'application/json' };
   if(CFG.apiKey) headers['Authorization'] = CFG.apiKey;
 
-  addApiLog('📤 送信中... id='+entry.id+' '+entry.company);
+  addApiLog('送信中... id='+entry.id+' '+entry.company);
 
   fetch(CFG.apiUrl, {
     method: 'POST',
@@ -3808,12 +3837,12 @@ function sendToApi(entry) {
     body: JSON.stringify(payload)
   }).then(function(res) {
     if(res.ok) {
-      addApiLog('✅ 送信完了 id='+entry.id+' HTTP'+res.status);
+      addApiLog('送信完了 id='+entry.id+' HTTP'+res.status);
     } else {
-      addApiLog('❌ 送信エラー id='+entry.id+' HTTP'+res.status);
+      addApiLog('送信エラー id='+entry.id+' HTTP'+res.status);
     }
   }).catch(function(err) {
-    addApiLog('❌ 接続失敗 id='+entry.id+' '+err.message);
+    addApiLog('接続失敗 id='+entry.id+' '+err.message);
   });
 }
 
@@ -3832,21 +3861,21 @@ function testApiConnection() {
   var url = document.getElementById('cfg-api-url').value.trim();
   if(!url) {
     resEl.className = 'geo-result ng';
-    resEl.textContent = '❌ APIのURLを入力してください';
+    resEl.textContent = 'APIのURLを入力してください';
     return;
   }
   resEl.className = 'geo-result info';
-  resEl.textContent = '🔌 接続テスト中...';
+  resEl.textContent = '接続テスト中...';
   var headers = { 'Content-Type': 'application/json' };
   var key = document.getElementById('cfg-api-key').value.trim();
   if(key) headers['Authorization'] = key;
   fetch(url, { method: 'GET', headers: headers })
     .then(function(res) {
       resEl.className = 'geo-result ok';
-      resEl.textContent = '✅ 接続成功！ HTTP '+res.status+'\n（POSTエンドポイントの場合はGETで405が返ることがあります）';
+      resEl.textContent = '接続成功！ HTTP '+res.status+'\n（POSTエンドポイントの場合はGETで405が返ることがあります）';
     }).catch(function(err) {
       resEl.className = 'geo-result ng';
-      resEl.textContent = '❌ 接続できません：'+err.message+'\nURLを確認してください。';
+      resEl.textContent = '接続できません：'+err.message+'\nURLを確認してください。';
     });
 }
 
@@ -3868,7 +3897,7 @@ function showApiSchema() {
   var resEl = document.getElementById('api-test-result');
   resEl.style.display = 'block';
   resEl.className = 'geo-result ok';
-  resEl.textContent = '📄 送信JSONデータのサンプル：\n' + JSON.stringify(sample, null, 2);
+  resEl.textContent = '送信JSONデータのサンプル：\n' + JSON.stringify(sample, null, 2);
 }
 
 // =====================================================
@@ -3958,7 +3987,7 @@ function plateUpdateHidden(prefix) {
   var hiddenEl = document.getElementById(prefix+'-plate');
   if(hiddenEl) hiddenEl.value = plateDisplay;
   var prevEl = document.getElementById(prefix+'-plate-preview');
-  if(prevEl) prevEl.textContent = plateDisplay ? '📋 ' + plateDisplay : '';
+  if(prevEl) prevEl.textContent = plateDisplay ? plateDisplay : '';
   autoFillByPlate(prefix, plateVal);
 }
 
@@ -3988,7 +4017,7 @@ function autoFillByPlate(prefix, plateVal) {
     var cEl = document.getElementById(prefix+'-cargo');
     for(var i=0;i<vEl.options.length;i++){ if(vEl.options[i].value===d.vehicle) vEl.selectedIndex=i; }
     for(var i=0;i<cEl.options.length;i++){ if(cEl.options[i].value===d.cargo) cEl.selectedIndex=i; }
-    bannerEl.textContent = '✅ 前回登録情報を自動入力しました（'+getPlate(prefix)+'）';
+    bannerEl.textContent = '前回登録情報を自動入力しました（'+getPlate(prefix)+'）';
     bannerEl.style.display = 'block';
   } else {
     bannerEl.style.display = 'none';
@@ -4045,16 +4074,16 @@ function geocodeAddress() {
       document.getElementById('cfg-lat-disp').textContent = lat.toFixed(6);
       document.getElementById('cfg-lng-disp').textContent = lng.toFixed(6);
       resEl.className = 'geo-result ok';
-      resEl.textContent = '✅ 座標を取得しました\n住所：'+data[0].properties.title+'\n緯度：'+lat.toFixed(6)+'　経度：'+lng.toFixed(6);
+      resEl.textContent = '座標を取得しました\n住所：'+data[0].properties.title+'\n緯度：'+lat.toFixed(6)+'　経度：'+lng.toFixed(6);
       try { localStorage.setItem('mabuchi_cfg', JSON.stringify(CFG)); } catch(e) {}
       fbDB.ref('settings/config').set(CFG).catch(function(e){ console.warn('CFG save err:', e); });
     } else {
       resEl.className = 'geo-result ng';
-      resEl.textContent = '❌ 住所が見つかりませんでした。\n入力例：愛知県弥富市楠3-9-1\n番地まで入力すると精度が上がります。';
+      resEl.textContent = '住所が見つかりませんでした。\n入力例：愛知県弥富市楠3-9-1\n番地まで入力すると精度が上がります。';
     }
   }).catch(function(){
     resEl.className = 'geo-result ng';
-    resEl.textContent = '❌ 取得失敗しました。\n直接「緯度・経度」欄に入力することもできます。';
+    resEl.textContent = '取得失敗しました。\n直接「緯度・経度」欄に入力することもできます。';
   });
 }
 
@@ -4063,7 +4092,7 @@ function useCurrentGPS() {
   resEl.style.display = 'block';
   resEl.className = 'geo-result info';
   resEl.textContent = '現在地のGPS座標を取得中...';
-  if(!navigator.geolocation) { resEl.className='geo-result ng'; resEl.textContent='❌ GPS非対応端末です'; return; }
+  if(!navigator.geolocation) { resEl.className='geo-result ng'; resEl.textContent='GPS非対応端末です'; return; }
   navigator.geolocation.getCurrentPosition(function(pos){
     var lat = pos.coords.latitude, lng = pos.coords.longitude;
     CFG.lat = lat; CFG.lng = lng;
@@ -4072,13 +4101,13 @@ function useCurrentGPS() {
     document.getElementById('cfg-lat-disp').textContent = lat.toFixed(6);
     document.getElementById('cfg-lng-disp').textContent = lng.toFixed(6);
     resEl.className = 'geo-result ok';
-    resEl.textContent = '✅ 現在地を工場座標に設定しました\n緯度：'+lat.toFixed(6)+'　経度：'+lng.toFixed(6)+'\n精度：±'+Math.round(pos.coords.accuracy)+'m';
+    resEl.textContent = '現在地を工場座標に設定しました\n緯度：'+lat.toFixed(6)+'　経度：'+lng.toFixed(6)+'\n精度：±'+Math.round(pos.coords.accuracy)+'m';
     try { localStorage.setItem('mabuchi_cfg', JSON.stringify(CFG)); } catch(e) {}
     fbDB.ref('settings/config').set(CFG).catch(function(e){ console.warn('CFG save err:', e); });
   }, function(err){
     var msgs=['','位置情報の使用が許可されていません','位置情報を取得できませんでした','タイムアウトしました'];
     resEl.className = 'geo-result ng';
-    resEl.textContent = '❌ GPS取得失敗：'+(msgs[err.code]||err.message);
+    resEl.textContent = 'GPS取得失敗：'+(msgs[err.code]||err.message);
   }, {enableHighAccuracy:true, timeout:15000});
 }
 
@@ -4198,6 +4227,7 @@ function startFirebaseListener() {
         timeStr: d.timeStr,
         status: d.status,
         waitMin: d.waitMin >= 0 ? d.waitMin : null,
+        editLog: Array.isArray(d.editLog) ? d.editLog : (d.editLog ? Object.values(d.editLog) : []),
         reason: (d.reason && d.reason !== '__clear__') ? d.reason : ''
       };
       list.push(e);
@@ -4210,9 +4240,9 @@ function startFirebaseListener() {
     list.sort(function(a,b){return a.id - b.id;});
     vehicles = list;
     renderAll();
-    showFbStatus('🟢 同期中');
+    showFbStatus('同期中');
   }, function(err) {
-    showFbStatus('🔴 接続エラー: ' + err.message);
+    showFbStatus('接続エラー: ' + err.message);
   });
 }
 
@@ -4229,11 +4259,11 @@ function updateClock() {
   var cur = h*60+m;
   var isNight = cur >= 17*60+30 || cur < 8*60+30;
   var badge = document.getElementById('header-badge');
-  badge.textContent = isNight ? '🌙 時間外' : 'デモ版';
+  badge.textContent = isNight ? '時間外' : 'デモ版';
   badge.className = isNight ? 'night-badge' : 'badge';
   var el = document.getElementById('night-time-badge');
   if(el){
-    el.textContent = '現在 '+h+':'+(m<10?'0':'')+m + (isNight?' ✅ 時間外受付中（17:30〜翌8:30）':' ❌ 時間内（受付不要）');
+    el.textContent = '現在 '+h+':'+(m<10?'0':'')+m + (isNight?' 時間外受付中（17:30〜翌8:30）':' 時間内（受付不要）');
     el.className = 'night-time-badge '+(isNight?'in-time':'out-time');
   }
 }
@@ -4281,24 +4311,24 @@ function doGPS() {
   var isNight=cur>=17*60+30||cur<8*60+30;
   var resEl=document.getElementById('night-gps-result');
   var btn=document.getElementById('btn-gps');
-  btn.disabled=true; btn.textContent='📍 取得中...';
+  btn.disabled=true; btn.textContent='取得中...';
   resEl.style.display='block'; resEl.className='night-result info'; resEl.textContent='GPS位置情報を取得しています...';
   if(!isNight){
     resEl.className='night-result ng';
-    resEl.textContent='❌ 現在は時間内です（8:30〜17:30）\n夜間受付は17:30〜翌8:30のみ有効です。\n\n通常受付は「手入力」タブをご利用ください。';
-    btn.disabled=false; btn.textContent='📍 GPS位置を確認する'; return;
+    resEl.textContent='現在は時間内です（8:30〜17:30）\n夜間受付は17:30〜翌8:30のみ有効です。\n\n通常受付は「手入力」タブをご利用ください。';
+    btn.disabled=false; btn.textContent='GPS位置を確認する'; return;
   }
   if(!CFG.gpsEnabled){
     resEl.className='night-result ok';
-    resEl.textContent='✅ GPS確認スキップ（設定でOFF）\n↓ 受付フォームが表示されました';
+    resEl.textContent='GPS確認スキップ（設定でOFF）\n↓ 受付フォームが表示されました';
     gpsVerified=true;
     document.getElementById('night-form-area').style.display='block';
     document.getElementById('night-form-area').scrollIntoView({behavior:'smooth'});
-    btn.disabled=false; btn.textContent='📍 GPS位置を確認する'; return;
+    btn.disabled=false; btn.textContent='GPS位置を確認する'; return;
   }
   if(!navigator.geolocation){
-    resEl.className='night-result ng'; resEl.textContent='❌ この端末はGPSに対応していません。\nスタッフにお声がけください。';
-    btn.disabled=false; btn.textContent='📍 GPS位置を確認する'; return;
+    resEl.className='night-result ng'; resEl.textContent='この端末はGPSに対応していません。\nスタッフにお声がけください。';
+    btn.disabled=false; btn.textContent='GPS位置を確認する'; return;
   }
   navigator.geolocation.getCurrentPosition(
     function(pos){
@@ -4307,21 +4337,21 @@ function doGPS() {
       var ok=dist<=CFG.gpsRadius;
       if(ok){
         resEl.className='night-result ok';
-        resEl.textContent='✅ GPS認証成功\n工場まで約'+dist+'m（'+CFG.gpsRadius+'m以内）\n精度：±'+Math.round(acc)+'m\n\n↓ 受付フォームが表示されました';
+        resEl.textContent='GPS認証成功\n工場まで約'+dist+'m（'+CFG.gpsRadius+'m以内）\n精度：±'+Math.round(acc)+'m\n\n↓ 受付フォームが表示されました';
         gpsVerified=true;
         document.getElementById('night-form-area').style.display='block';
         document.getElementById('night-form-area').scrollIntoView({behavior:'smooth'});
       } else {
         resEl.className='night-result ng';
-        resEl.textContent='❌ GPS認証失敗\n工場まで約'+dist+'m（'+CFG.gpsRadius+'m以上離れています）\n\n工場ゲート付近で再度お試しください。\n精度：±'+Math.round(acc)+'m';
+        resEl.textContent='GPS認証失敗\n工場まで約'+dist+'m（'+CFG.gpsRadius+'m以上離れています）\n\n工場ゲート付近で再度お試しください。\n精度：±'+Math.round(acc)+'m';
         gpsVerified=false;
       }
-      btn.disabled=false; btn.textContent='📍 GPS位置を確認する';
+      btn.disabled=false; btn.textContent='GPS位置を確認する';
     },
     function(err){
       var msgs=['','位置情報の使用が許可されていません','位置情報を取得できませんでした','タイムアウトしました'];
-      resEl.className='night-result ng'; resEl.textContent='❌ エラー: '+(msgs[err.code]||err.message);
-      btn.disabled=false; btn.textContent='📍 GPS位置を確認する';
+      resEl.className='night-result ng'; resEl.textContent='エラー: '+(msgs[err.code]||err.message);
+      btn.disabled=false; btn.textContent='GPS位置を確認する';
     },
     {enableHighAccuracy:true,timeout:15000,maximumAge:0}
   );
@@ -4377,7 +4407,7 @@ function submitForm() {
   document.getElementById('c-cargo').textContent=cargo;
   document.getElementById('c-time').textContent=entry.timeStr;
   var estEl=document.getElementById('c-estwait');
-  if(CFG.estWaitEnabled){estEl.textContent='⏱ 推定待ち時間：約'+estMin+'分';estEl.style.display='inline-block';}
+  if(CFG.estWaitEnabled){estEl.textContent='推定待ち時間：約'+estMin+'分';estEl.style.display='inline-block';}
   else{estEl.style.display='none';}
   // 複数台登録ボタン表示
   var mBtn=document.getElementById('multi-reg-btn-area');
@@ -4434,11 +4464,11 @@ function renderSessionList() {
     var pos = waiting.findIndex(function(x){return x.id===id;})+1;
     var isDone = v.status === 'done';
     return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px;background:'+(isDone?'#F0FFF4':'#EFF6FF')+';border-radius:10px;border-left:4px solid '+(isDone?'#028090':'#1E3A5F')+';">'
-      +'<div style="font-size:22px;font-weight:bold;color:'+(isDone?'#028090':'#1E3A5F')+';min-width:32px;text-align:center;">'+(isDone?'✅':pos+'番')+'</div>'
+      +'<div style="font-size:22px;font-weight:bold;color:'+(isDone?'#028090':'#1E3A5F')+';min-width:32px;text-align:center;">'+(isDone?'完了':pos+'番')+'</div>'
       +'<div style="flex:1;">'
         +'<div style="font-size:14px;font-weight:bold;color:#1E3A5F;">'+v.company+'</div>'
         +'<div style="font-size:12px;color:#64748B;">車番：'+v.plate+'　受付 '+v.timeStr+'</div>'
-        +(isDone?'<div style="font-size:11px;color:#028090;font-weight:bold;">✓ 荷下ろし完了</div>':'<div style="font-size:11px;color:#94A3B8;">順番が来たらスタッフがお呼びします</div>')
+        +(isDone?'<div style="font-size:11px;color:#028090;font-weight:bold;">荷下ろし完了</div>':'<div style="font-size:11px;color:#94A3B8;">順番が来たらスタッフがお呼びします</div>')
       +'</div>'
     +'</div>';
   }).join('');
@@ -4530,8 +4560,8 @@ function setSort(s) {
 
 // ===== タグ生成 =====
 function cargoTag(cargo) {
-  if(cargo.includes('フォーク')) return '<span class="tag fork">🔧 '+cargo+'</span>';
-  if(cargo.includes('クレーン')) return '<span class="tag crane">🏗 '+cargo+'</span>';
+  if(cargo.includes('フォーク')) return '<span class="tag fork">'+cargo+'</span>';
+  if(cargo.includes('クレーン')) return '<span class="tag crane">'+cargo+'</span>';
   return '<span class="tag">'+cargo+'</span>';
 }
 
@@ -4547,32 +4577,44 @@ function makeCard(v,pos) {
       +'<div class="card-detail">'
         +'<span class="tag">'+v.vehicle+'</span>'
         +cargoTag(v.cargo)
-        +(v.isNight?'<span class="tag night-t">🌙 夜間</span>':'')
-        +(v.location?'<span class="tag loc">📍'+v.location+'</span>':'')
-        +(isOver?'<span class="tag over">⏰ '+elapsedMin+'分経過</span>':'')
+        +(v.isNight?'<span class="tag night-t">夜間</span>':'')
+        +(v.location?'<span class="tag loc">'+v.location+'</span>':'')
+        +(isOver?'<span class="tag over">'+elapsedMin+'分経過</span>':'')
       +'</div>'
       +'<div><select class="location-select" onchange="setLocation('+v.id+',this.value)">'
-        +'<option value=""'+(v.location?'':' selected')+'>📍 場所を設定</option>'+locOpts
+        +'<option value=""'+(v.location?'':' selected')+'>場所を設定</option>'+locOpts
       +'</select></div>'
-      +(v.reason?'<div class="wait-reason">📢 '+v.reason+'</div>':'')
-      +(v.client?'<div style="font-size:10px;color:#028090;margin-top:2px;">📋 '+v.client+'</div>':'')
+      +(v.reason?'<div class="wait-reason">'+v.reason+'</div>':'')
+      +(v.client?'<div style="font-size:10px;color:#028090;margin-top:2px;">'+v.client+'</div>':'')
       +'<div class="card-time">受付 '+v.timeStr+'　車番：'+v.plate+'　待機'+elapsedMin+'分'+(v.note?'　備考：'+v.note:'')+'</div>'
     +'</div>'
     +'<div class="card-actions">'
-      +'<button class="btn btn-complete" onclick="completeVehicle('+v.id+')">✅ 完了</button>'
-      +'<button class="btn btn-reorder" onclick="openModal('+v.id+')">📋 調整</button>'
+      +'<button class="btn btn-complete" onclick="completeVehicle('+v.id+')">完了</button>'
+      +'<button class="btn btn-reorder" onclick="openModal('+v.id+')">調整</button>'
     +'</div>'
   +'</div>';
 }
 
 // ===== 完了カード =====
 function makeDoneCard(v) {
+  var editLogHtml = '';
+  if(v.editLog && v.editLog.length > 0) {
+    var logItems = v.editLog.map(function(l){
+      return '<div style="font-size:10px;color:#64748B;border-left:2px solid #CBD5E1;padding-left:5px;margin-top:2px;">'
+        + l.at + '　' + l.min + '分に修正　理由：' + l.reason + '</div>';
+    }).join('');
+    editLogHtml = '<div style="margin-top:4px;">' + logItems + '</div>';
+  }
   return '<div class="waiting-card" style="opacity:0.65;border-left:4px solid #028090;">'
-    +'<div class="num-badge" style="background:#028090;">✓</div>'
-    +'<div class="card-info">'
+    +'<div class="num-badge" style="background:#028090;">完</div>'
+    +'<div class="card-info" style="flex:1;">'
       +'<div class="card-company">'+v.company+'</div>'
-      +'<div class="card-detail"><span class="tag">'+v.vehicle+'</span>'+cargoTag(v.cargo)+(v.isNight?'<span class="tag night-t">🌙 夜間</span>':'')+'</div>'
+      +'<div class="card-detail"><span class="tag">'+v.vehicle+'</span>'+cargoTag(v.cargo)+(v.isNight?'<span class="tag night-t">夜間</span>':'')+'</div>'
       +'<div class="card-time">受付 '+v.timeStr+'　車番：'+v.plate+(v.waitMin!==null?'　<span style="color:#028090;font-weight:bold;">待ち'+v.waitMin+'分</span>':'')+(v.note?'　備考：'+v.note:'')+'</div>'
+      +editLogHtml
+    +'</div>'
+    +'<div class="card-actions">'
+      +'<button class="btn btn-reorder" onclick="openEditWaitModal('+v.id+')" style="font-size:11px;padding:4px 8px;">時間修正</button>'
     +'</div>'
   +'</div>';
 }
@@ -4671,21 +4713,21 @@ function renderAll() {
   if(isToday(viewDate)) {
     document.getElementById('list-count').textContent=waiting.length+'件';
     var ob=document.getElementById('over-badge');
-    if(over>0){ob.textContent='⏰ '+CFG.warnMin+'分超 '+over+'件';ob.style.display='inline';}
+    if(over>0){ob.textContent=CFG.warnMin+'分超 '+over+'件';ob.style.display='inline';}
     else{ob.style.display='none';}
   }
 
   var miniEl=document.getElementById('mini-list');
   if(!waiting.length){
-    miniEl.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div><div>現在待機中の車両はありません</div></div>';
+    miniEl.innerHTML='<div class="empty-state"><div class="empty-icon"></div><div>現在待機中の車両はありません</div></div>';
   } else {
     miniEl.innerHTML=waiting.map(function(v,i){
       return '<div class="waiting-card '+(v.isNight?'night-reg':'')+'">'
         +'<div class="num-badge '+(v.isNight?'night':'')+'">'+( i+1)+'</div>'
         +'<div class="card-info">'
           +'<div class="card-company">'+(i+1)+'番目の方</div>'
-          +'<div class="card-detail"><span class="tag">'+v.vehicle+'</span>'+cargoTag(v.cargo)+(v.location?'<span class="tag loc">📍'+v.location+'</span>':'')+'</div>'
-          +(v.reason?'<div class="wait-reason" style="font-size:15px;padding:6px 12px;font-weight:bold;">📢 '+v.reason+'</div>':'')
+          +'<div class="card-detail"><span class="tag">'+v.vehicle+'</span>'+cargoTag(v.cargo)+(v.location?'<span class="tag loc">'+v.location+'</span>':'')+'</div>'
+          +(v.reason?'<div class="wait-reason" style="font-size:15px;padding:6px 12px;font-weight:bold;">'+v.reason+'</div>':'')
           +'<div class="card-time">受付 '+v.timeStr+'</div>'
         +'</div>'
       +'</div>';
@@ -4699,7 +4741,7 @@ function renderAll() {
     var doneCount=document.getElementById('done-count');
     // 待機中
     if(!waiting.length){
-      mainEl.innerHTML='<div class="empty-state"><div class="empty-icon">🚛</div><div>現在待機中の車両はありません</div></div>';
+      mainEl.innerHTML='<div class="empty-state"><div class="empty-icon"></div><div>現在待機中の車両はありません</div></div>';
     } else {
       var html='';
       if(currentSort==='arrival'){
@@ -4709,7 +4751,7 @@ function renderAll() {
         waiting.forEach(function(v){if(!groups[v.cargo])groups[v.cargo]=[];groups[v.cargo].push(v);});
         var pos=1;
         Object.entries(groups).forEach(function(e){
-          html+='<div class="group-header">🔹 '+e[0]+'（'+e[1].length+'台）</div>';
+          html+='<div class="group-header">'+e[0]+'（'+e[1].length+'台）</div>';
           e[1].forEach(function(v){html+=makeCard(v,pos++);});
         });
       } else {
@@ -4718,7 +4760,7 @@ function renderAll() {
         var pos=1;
         var order=CFG.locations.concat(['未定']);
         order.forEach(function(key){
-          if(groups[key]){html+='<div class="group-header">📍 '+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){html+=makeCard(v,pos++);}); }
+          if(groups[key]){html+='<div class="group-header">'+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){html+=makeCard(v,pos++);}); }
         });
       }
       mainEl.innerHTML=html;
@@ -4787,7 +4829,7 @@ function switchViewDateListener() {
     return;
   }
   // 過去/未来の日付：該当日のFirebaseデータを一回読み込み
-  document.getElementById('main-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div>読み込み中...</div></div>';
+  document.getElementById('main-list').innerHTML = '<div class="empty-state"><div class="empty-icon"></div><div>読み込み中...</div></div>';
   viewDateListener = fbDB.ref('vehicles/'+key);
   viewDateListener.on('value', function(snapshot) {
     var data = snapshot.val() || {};
@@ -4800,6 +4842,7 @@ function switchViewDateListener() {
         note: d.note||'', client: d.client||'', isNight: d.isNight||false,
         time: new Date(d.timeMs), timeStr: d.timeStr,
         status: d.status, waitMin: d.waitMin>=0?d.waitMin:null,
+        editLog: Array.isArray(d.editLog) ? d.editLog : (d.editLog ? Object.values(d.editLog) : []),
         reason: (d.reason&&d.reason!=='__clear__')?d.reason:''
       };
       list.push(e);
@@ -4818,7 +4861,7 @@ function renderListForDate(list) {
   var doneCount = document.getElementById('done-count');
   // 待機中カラム
   if(!list.length) {
-    if(mainEl) mainEl.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div>この日のデータはありません</div></div>';
+    if(mainEl) mainEl.innerHTML = '<div class="empty-state"><div class="empty-icon"></div><div>この日のデータはありません</div></div>';
     if(doneEl) doneEl.innerHTML = '<div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div>';
     if(doneCount) doneCount.textContent = '';
     return;
@@ -4831,7 +4874,7 @@ function renderListForDate(list) {
     waiting.forEach(function(v){if(!groups[v.cargo])groups[v.cargo]=[];groups[v.cargo].push(v);});
     var pos=1;
     Object.entries(groups).forEach(function(e){
-      wHtml+='<div class="group-header">🔹 '+e[0]+'（'+e[1].length+'台）</div>';
+      wHtml+='<div class="group-header">'+e[0]+'（'+e[1].length+'台）</div>';
       e[1].forEach(function(v){wHtml+=makeCard(v,pos++);});
     });
   } else {
@@ -4840,10 +4883,10 @@ function renderListForDate(list) {
     var pos=1;
     var order=CFG.locations.concat(['未定']);
     order.forEach(function(key){
-      if(groups[key]){wHtml+='<div class="group-header">📍 '+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){wHtml+=makeCard(v,pos++);}); }
+      if(groups[key]){wHtml+='<div class="group-header">'+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){wHtml+=makeCard(v,pos++);}); }
     });
   }
-  if(mainEl) mainEl.innerHTML = wHtml || '<div class="empty-state"><div class="empty-icon">🚛</div><div>待機中の車両はありません</div></div>';
+  if(mainEl) mainEl.innerHTML = wHtml || '<div class="empty-state"><div class="empty-icon"></div><div>待機中の車両はありません</div></div>';
   // 完了カラム（受付時刻の逆順）
   if(doneCount) doneCount.textContent = done.length ? '（'+done.length+'台）' : '';
   if(!done.length) {
@@ -4854,6 +4897,80 @@ function renderListForDate(list) {
   }
 }
 
+
+// ===== 完了時間修正モーダル =====
+var editWaitTargetId = null;
+
+function openEditWaitModal(id) {
+  var v = vehicles.find(function(x){return x.id===id;});
+  if(!v) return;
+  editWaitTargetId = id;
+  // 車両情報表示
+  var infoEl = document.getElementById('edit-wait-vehicle-info');
+  if(infoEl) infoEl.innerHTML = '会社名：<b>'+v.company+'</b>　車番：<b>'+v.plate+'</b><br>受付：'+v.timeStr+'　現在の待機時間：<b>'+(v.waitMin!==null?v.waitMin+'分':'未設定')+'</b>';
+  // 現在値をセット
+  var minEl = document.getElementById('edit-wait-min');
+  if(minEl) minEl.value = v.waitMin !== null ? v.waitMin : '';
+  // 理由クリア
+  var reasonEl = document.getElementById('edit-wait-reason');
+  if(reasonEl) reasonEl.value = '';
+  // 修正履歴表示
+  var logArea = document.getElementById('edit-wait-log');
+  var logBody = document.getElementById('edit-wait-log-body');
+  if(v.editLog && v.editLog.length > 0) {
+    var logHtml = v.editLog.map(function(l){
+      return '<div>'+l.at+'　→ '+l.min+'分に修正　（'+l.reason+'）</div>';
+    }).join('');
+    if(logBody) logBody.innerHTML = logHtml;
+    if(logArea) logArea.style.display = '';
+  } else {
+    if(logArea) logArea.style.display = 'none';
+  }
+  document.getElementById('edit-wait-modal').classList.add('show');
+}
+
+function closeEditWaitModal() {
+  document.getElementById('edit-wait-modal').classList.remove('show');
+  editWaitTargetId = null;
+}
+
+function saveEditWait() {
+  var reasonEl = document.getElementById('edit-wait-reason');
+  var minEl = document.getElementById('edit-wait-min');
+  if(!reasonEl || !minEl) return;
+  var reason = reasonEl.value.trim();
+  var newMin = parseInt(minEl.value);
+  if(!reason) {
+    alert('修正理由を入力してください（必須）');
+    reasonEl.focus();
+    return;
+  }
+  if(isNaN(newMin) || newMin < 0) {
+    alert('待機時間（分）を正しく入力してください');
+    minEl.focus();
+    return;
+  }
+  var v = vehicles.find(function(x){return x.id===editWaitTargetId;});
+  if(!v) { closeEditWaitModal(); return; }
+  // 修正ログ作成
+  var now = new Date();
+  var hh = ('0'+now.getHours()).slice(-2);
+  var mm = ('0'+now.getMinutes()).slice(-2);
+  var logEntry = { at: hh+':'+mm, min: newMin, reason: reason };
+  // 既存のeditLogに追記
+  var newLog = (v.editLog || []).concat([logEntry]);
+  // Firebase更新
+  var ref = vehicleRef().child(String(editWaitTargetId));
+  ref.update({ waitMin: newMin, editLog: newLog }).then(function(){
+    closeEditWaitModal();
+  }).catch(function(e){ alert('保存エラー: '+e.message); });
+}
+
+// モーダル外クリックで閉じる
+document.getElementById('edit-wait-modal').addEventListener('click', function(e){
+  if(e.target === this) closeEditWaitModal();
+});
+
 // ===== 本日データリセット（Firebase） =====
 function clearTodayData() {
   if(!confirm('本日のデータをすべて削除しますか？\n（全端末から消えます）')) return;
@@ -4861,7 +4978,7 @@ function clearTodayData() {
     vehicles = [];
     counter = 0;
     renderAll();
-    showFbStatus('🟢 同期中（リセット完了）');
+    showFbStatus('同期中（リセット完了）');
   }).catch(function(e) {
     alert('削除エラー: ' + e.message);
   });
@@ -4872,7 +4989,7 @@ function clearViewDateData() {
   if(!confirm(label+'のデータをすべて削除しますか？\n（全端末から消えます）')) return;
   fbDB.ref('vehicles/'+key).remove().then(function() {
     if(isToday(viewDate)){ vehicles=[]; counter=0; renderAll(); }
-    showFbStatus('🟢 同期中（リセット完了）');
+    showFbStatus('同期中（リセット完了）');
   }).catch(function(e){ alert('削除エラー: '+e.message); });
 }
 
