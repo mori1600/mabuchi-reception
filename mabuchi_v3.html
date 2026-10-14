@@ -4,6 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>マブチ 荷下ろし受付システム</title>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+// ===== Firebase 設定 =====
+var FIREBASE_CONFIG = {
+  databaseURL: "https://mabuchi-reception-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+var fbApp = firebase.initializeApp(FIREBASE_CONFIG);
+var fbDB  = firebase.database();
+var FB_REF = fbDB.ref('vehicles');
+
+// 今日の日付キー（日付が変わったら自動的に新しいデータに）
+function todayKey() {
+  var d = new Date();
+  return d.getFullYear()+''+('0'+(d.getMonth()+1)).slice(-2)+''+('0'+d.getDate()).slice(-2);
+}
+function vehicleRef() { return fbDB.ref('vehicles/'+todayKey()); }
+</script>
 <script>
 /* ============================================================
    QR Code generator — qrcode (npm) browserify bundle (MIT)
@@ -3100,7 +3119,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 </head>
 <body>
 
-<div class="header"> <div> <div class="header-title" id="hdr-factory">マブチ 荷下ろし受付</div> <div class="header-subtitle">個人情報ゼロ設計</div> </div> <div class="header-right"> <div class="clock" id="header-clock">--:--</div> <div class="badge" id="header-badge">デモ版</div> </div>
+<div class="header"> <div> <div class="header-title" id="hdr-factory">マブチ 荷下ろし受付</div> <div class="header-subtitle">個人情報ゼロ設計</div> </div> <div class="header-right"> <div class="clock" id="header-clock">--:--</div> <div class="badge" id="header-badge">クラウド版</div> <div id="fb-status" style="font-size:10px;color:#94A3B8;margin-top:2px;">🔄 接続中...</div> </div>
 </div>
 
 <div class="tabs">
@@ -3123,6 +3142,9 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 <!-- ========== 管理画面 ========== -->
 <div id="panel-list" class="panel content"> <div class="list-header"> <h2>待機一覧（管理画面）</h2> <div style="display:flex;gap:5px;align-items:center;"> <span class="count-badge" id="list-count">0件</span> <span class="alert-badge" id="over-badge" style="display:none;"></span> </div> </div> <div class="sort-btns"> <button class="sort-btn active" id="sort-arrival"  onclick="setSort('arrival')">受付順</button> <button class="sort-btn"        id="sort-cargo"    onclick="setSort('cargo')">荷役方法別</button> <button class="sort-btn"        id="sort-location" onclick="setSort('location')">場所別</button> </div> <div id="main-list"> <div class="empty-state"><div class="empty-icon"></div><div>現在待機中の車両はありません</div></div> </div>
+<div style="text-align:right;padding:8px 0 4px;">
+  <button onclick="clearTodayData()" style="font-size:11px;padding:5px 10px;background:#C0392B;color:#fff;border:none;border-radius:6px;cursor:pointer;">🗑 本日データをリセット</button>
+</div>
 </div>
 
 <!-- ========== ドライバー登録（手入力） ========== -->
@@ -3336,7 +3358,7 @@ var CFG = {
   vehicleTypes: ['トレーラ','10ton平','10tonウイング','4ton平','その他'],
   clientField: false,
   // QRコード用ベースURL（Netlify等にデプロイ後に設定する）
-  baseUrl: 'https://amazing-baklava-5e4f3c.netlify.app/mabuchi_v3.html',
+  baseUrl: 'https://mori1600.github.io/mabuchi-reception/mabuchi_v3.html',
   // API連携設定
   apiEnabled: false,
   apiUrl: '',
@@ -3730,6 +3752,85 @@ var counter = 0;
 var currentSort = 'arrival';
 var modalTargetId = null;
 
+// ===== Firebase 書き込み =====
+function fbSaveEntry(entry) {
+  var data = {
+    id: entry.id,
+    company: entry.company,
+    plate: entry.plate,
+    vehicle: entry.vehicle,
+    cargo: entry.cargo,
+    location: entry.location || '',
+    note: entry.note || '',
+    client: entry.client || '',
+    isNight: entry.isNight ? true : false,
+    timeMs: entry.time.getTime(),
+    timeStr: entry.timeStr,
+    status: entry.status,
+    waitMin: entry.waitMin !== null ? entry.waitMin : -1,
+    reason: entry.reason || ''
+  };
+  vehicleRef().child(String(entry.id)).set(data).catch(function(e){
+    console.warn('Firebase書き込みエラー:', e.message);
+  });
+}
+
+function fbUpdateEntry(id, fields) {
+  vehicleRef().child(String(id)).update(fields).catch(function(e){
+    console.warn('Firebase更新エラー:', e.message);
+  });
+}
+
+function fbDeleteEntry(id) {
+  vehicleRef().child(String(id)).remove().catch(function(e){
+    console.warn('Firebase削除エラー:', e.message);
+  });
+}
+
+// ===== Firebase リアルタイムリスナー =====
+function startFirebaseListener() {
+  vehicleRef().on('value', function(snapshot) {
+    var data = snapshot.val() || {};
+    var list = [];
+    Object.keys(data).forEach(function(k) {
+      var d = data[k];
+      var e = {
+        id: d.id,
+        company: d.company,
+        plate: d.plate,
+        vehicle: d.vehicle,
+        cargo: d.cargo,
+        location: d.location || '',
+        note: d.note || '',
+        client: d.client || '',
+        isNight: d.isNight || false,
+        time: new Date(d.timeMs),
+        timeStr: d.timeStr,
+        status: d.status,
+        waitMin: d.waitMin >= 0 ? d.waitMin : null,
+        reason: d.reason || ''
+      };
+      list.push(e);
+    });
+    // counterを最大IDに合わせる（重複防止）
+    if(list.length) {
+      var maxId = Math.max.apply(null, list.map(function(e){return e.id;}));
+      if(maxId >= counter) counter = maxId; // 次のIDは counter++ で生成
+    }
+    list.sort(function(a,b){return a.id - b.id;});
+    vehicles = list;
+    renderAll();
+    showFbStatus('🟢 同期中');
+  }, function(err) {
+    showFbStatus('🔴 接続エラー: ' + err.message);
+  });
+}
+
+function showFbStatus(msg) {
+  var el = document.getElementById('fb-status');
+  if(el) el.textContent = msg;
+}
+
 // ===== 時計 =====
 function updateClock() {
   var now = new Date();
@@ -3840,12 +3941,14 @@ function registerVehicle(company,plate,vehicle,cargo,location,note,client,isNigh
   var now=new Date();
   var entry={
     id:counter, company:company, plate:plate, vehicle:vehicle, cargo:cargo,
-    location:location, note:note, client:client||'', isNight:isNight,
+    location:location||'', note:note||'', client:client||'', isNight:isNight,
     time:now, timeStr:now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes(),
     status:'waiting', waitMin:null, reason:''
   };
   vehicles.push(entry);
   saveToHistory(plate, company, vehicle, cargo);
+  // Firebase に保存（リスナーが全端末に同期）
+  fbSaveEntry(entry);
   // ──── 外部API連携（将来拡張） ────
   sendToApi(entry);
   return entry;
@@ -3918,12 +4021,19 @@ function resetNightForm() {
 // ===== 完了・場所・モーダル =====
 function completeVehicle(id) {
   var v=vehicles.find(function(x){return x.id===id;});
-  if(!v)return; v.status='done'; v.waitMin=Math.round((new Date()-v.time)/60000);
+  if(!v)return;
+  var waitMin=Math.round((new Date()-v.time)/60000);
+  // Firebase更新（リスナーが全端末に反映）
+  fbUpdateEntry(id, {status:'done', waitMin:waitMin});
+  // ローカルも即時反映（UX向上）
+  v.status='done'; v.waitMin=waitMin;
   renderAll();
 }
 function setLocation(id,val) {
   var v=vehicles.find(function(x){return x.id===id;});
-  if(v){v.location=val;renderAll();}
+  if(!v)return;
+  fbUpdateEntry(id, {location:val});
+  v.location=val;renderAll();
 }
 function openModal(id) {
   modalTargetId=id;
@@ -3934,7 +4044,11 @@ function openModal(id) {
 function closeModal() { document.getElementById('reorder-modal').classList.remove('show'); modalTargetId=null; }
 function saveReason() {
   var v=vehicles.find(function(x){return x.id===modalTargetId;});
-  if(v){v.reason=document.getElementById('reason-input').value.trim();}
+  if(v){
+    var reason=document.getElementById('reason-input').value.trim();
+    fbUpdateEntry(v.id, {reason:reason});
+    v.reason=reason;
+  }
   closeModal(); renderAll();
 }
 document.getElementById('reorder-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
@@ -4070,6 +4184,19 @@ function renderAll() {
   document.getElementById('vehicle-stats').innerHTML=makeBar(vehicleMap,'#1E3A5F');
 }
 
+// ===== 本日データリセット（Firebase） =====
+function clearTodayData() {
+  if(!confirm('本日のデータをすべて削除しますか？\n（全端末から消えます）')) return;
+  vehicleRef().remove().then(function() {
+    vehicles = [];
+    counter = 0;
+    renderAll();
+    showFbStatus('🟢 同期中（リセット完了）');
+  }).catch(function(e) {
+    alert('削除エラー: ' + e.message);
+  });
+}
+
 // ===== CSV =====
 function downloadCSV() {
   if(!vehicles.length){alert('データがありません');return;}
@@ -4103,6 +4230,9 @@ function init() {
 
   // QRコード生成（qrcode.js）
   initAllQR();
+
+  // Firebase リアルタイムリスナー起動（スマホ↔PC 同期）
+  startFirebaseListener();
 
   setInterval(renderAll, 60000);
   renderAll();
