@@ -3029,13 +3029,14 @@ body { font-family: 'Arial', sans-serif; background: #f0f4f8; color: #1a1a2e; }
 
 /* ===== 完了画面 ===== */
 .complete-screen { display: none; text-align: center; padding: 22px 14px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.complete-icon { font-size: 34px; margin-bottom: 6px; }
-.complete-num { font-size: 60px; font-weight: bold; color: #1E3A5F; line-height: 1; }
-.complete-label { font-size: 12px; color: #64748B; margin: 5px 0 14px; }
-.est-wait { font-size: 13px; color: #028090; font-weight: bold; background: #EAF8F2; padding: 5px 14px; border-radius: 20px; display: inline-block; margin-bottom: 12px; }
-.info-row { background: #f1f5f9; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #1a1a2e; margin-bottom: 5px; text-align: left; }
-.info-row span { color: #64748B; margin-right: 8px; }
-.notice-box { background: #EAF8F2; border: 1px solid #02C39A; border-radius: 8px; padding: 11px; margin-top: 12px; font-size: 12px; color: #028090; text-align: left; }
+.complete-icon { font-size: 40px; margin-bottom: 8px; }
+.complete-num { font-size: 72px; font-weight: bold; color: #1E3A5F; line-height: 1; }
+.complete-label { font-size: 18px; color: #64748B; margin: 8px 0 16px; font-weight: bold; }
+.est-wait { font-size: 17px; color: #028090; font-weight: bold; background: #EAF8F2; padding: 8px 18px; border-radius: 20px; display: inline-block; margin-bottom: 14px; }
+.info-row { background: #f1f5f9; border-radius: 10px; padding: 12px 16px; margin-bottom: 8px; text-align: left; display: flex; align-items: baseline; gap: 10px; }
+.info-row span { font-size: 13px; color: #64748B; flex-shrink: 0; min-width: 72px; }
+.info-row strong { font-size: 22px; color: #1a1a2e; font-weight: bold; word-break: break-all; }
+.notice-box { background: #EAF8F2; border: 1px solid #02C39A; border-radius: 8px; padding: 13px; margin-top: 14px; font-size: 15px; color: #028090; text-align: left; line-height: 1.6; }
 
 /* ===== 集計 ===== */
 .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
@@ -3406,10 +3407,23 @@ var CFG = {
 };
 
 function loadCfg() {
+  // localStorageからも読む（Firebaseが繋がるまでの初期値として）
   try {
     var s = localStorage.getItem('mabuchi_cfg');
     if(s) { var d = JSON.parse(s); Object.assign(CFG, d); }
   } catch(e) {}
+}
+function startCfgListener() {
+  // Firebaseから設定をリアルタイム同期（全端末に即反映）
+  fbDB.ref('settings/config').on('value', function(snapshot) {
+    var d = snapshot.val();
+    if(d) {
+      Object.assign(CFG, d);
+      try { localStorage.setItem('mabuchi_cfg', JSON.stringify(CFG)); } catch(e) {}
+      refreshSettingUI();
+      renderAll();
+    }
+  });
 }
 function saveCfg() {
   CFG.gpsEnabled   = document.getElementById('cfg-gps').checked;
@@ -3425,7 +3439,10 @@ function saveCfg() {
   CFG.apiUrl     = document.getElementById('cfg-api-url').value.trim();
   CFG.apiKey     = document.getElementById('cfg-api-key').value.trim();
   CFG.apiFormat  = document.getElementById('cfg-api-format').value;
+  // ローカルにも保存
   try { localStorage.setItem('mabuchi_cfg', JSON.stringify(CFG)); } catch(e) {}
+  // Firebaseにも保存（全端末に即反映）
+  fbDB.ref('settings/config').set(CFG).catch(function(e){ console.warn('CFG save err:', e); });
   refreshSettingUI();
   renderAll();
 }
@@ -3449,6 +3466,7 @@ function toggleAdvancedSection() {
 function saveFactoryName() {
   CFG.factoryName = document.getElementById('cfg-factory-name').value.trim() || 'マブチ 荷下ろし受付';
   try { localStorage.setItem('mabuchi_cfg', JSON.stringify(CFG)); } catch(e) {}
+  fbDB.ref('settings/config').set(CFG).catch(function(e){ console.warn('CFG save err:', e); });
   document.getElementById('hdr-factory').textContent = CFG.factoryName;
   document.getElementById('ent-factory-name').textContent = CFG.factoryName;
   document.getElementById('print-factory-name').textContent = CFG.factoryName;
@@ -3505,12 +3523,37 @@ function removeTag(type, i) {
   else if(type==='cargo') CFG.cargoTypes.splice(i,1);
   else if(type==='vehicle') CFG.vehicleTypes.splice(i,1);
   try { localStorage.setItem('mabuchi_cfg', JSON.stringify(CFG)); } catch(e) {}
+  fbDB.ref('settings/config').set(CFG).catch(function(e){ console.warn('CFG save err:', e); });
   refreshSettingUI();
   rebuildSelects();
 }
-function addLocation() { var v=document.getElementById('new-location').value.trim(); if(v&&CFG.locations.indexOf(v)<0){CFG.locations.push(v); try{localStorage.setItem('mabuchi_cfg',JSON.stringify(CFG));}catch(e){} refreshSettingUI(); rebuildSelects(); document.getElementById('new-location').value=''; }}
-function addCargo()    { var v=document.getElementById('new-cargo').value.trim();    if(v&&CFG.cargoTypes.indexOf(v)<0){CFG.cargoTypes.push(v); try{localStorage.setItem('mabuchi_cfg',JSON.stringify(CFG));}catch(e){} refreshSettingUI(); rebuildSelects(); document.getElementById('new-cargo').value=''; }}
-function addVehicle()  { var v=document.getElementById('new-vehicle').value.trim();  if(v&&CFG.vehicleTypes.indexOf(v)<0){CFG.vehicleTypes.push(v); try{localStorage.setItem('mabuchi_cfg',JSON.stringify(CFG));}catch(e){} refreshSettingUI(); rebuildSelects(); document.getElementById('new-vehicle').value=''; }}
+function addLocation() {
+  var v=document.getElementById('new-location').value.trim();
+  if(v&&CFG.locations.indexOf(v)<0){
+    CFG.locations.push(v);
+    try{localStorage.setItem('mabuchi_cfg',JSON.stringify(CFG));}catch(e){}
+    fbDB.ref('settings/config').set(CFG).catch(function(e){ console.warn('CFG save err:', e); });
+    refreshSettingUI(); rebuildSelects(); document.getElementById('new-location').value='';
+  }
+}
+function addCargo() {
+  var v=document.getElementById('new-cargo').value.trim();
+  if(v&&CFG.cargoTypes.indexOf(v)<0){
+    CFG.cargoTypes.push(v);
+    try{localStorage.setItem('mabuchi_cfg',JSON.stringify(CFG));}catch(e){}
+    fbDB.ref('settings/config').set(CFG).catch(function(e){ console.warn('CFG save err:', e); });
+    refreshSettingUI(); rebuildSelects(); document.getElementById('new-cargo').value='';
+  }
+}
+function addVehicle() {
+  var v=document.getElementById('new-vehicle').value.trim();
+  if(v&&CFG.vehicleTypes.indexOf(v)<0){
+    CFG.vehicleTypes.push(v);
+    try{localStorage.setItem('mabuchi_cfg',JSON.stringify(CFG));}catch(e){}
+    fbDB.ref('settings/config').set(CFG).catch(function(e){ console.warn('CFG save err:', e); });
+    refreshSettingUI(); rebuildSelects(); document.getElementById('new-vehicle').value='';
+  }
+}
 
 function rebuildSelects() {
   ['f-vehicle','nf-vehicle'].forEach(function(id){
@@ -3651,17 +3694,40 @@ function showApiSchema() {
 }
 
 // =====================================================
-// ===== 車番自動補完 (localStorage) =====
+// ===== 車番自動補完 (Firebase共有) =====
 // =====================================================
 var HISTORY_KEY = 'mabuchi_plate_history';
+// メモリ上の履歴キャッシュ（Firebaseから同期）
+var plateHistoryCache = {};
+
 function getHistory() {
-  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)||'{}'); } catch(e){ return {}; }
+  return plateHistoryCache;
 }
 function saveToHistory(plate, company, vehicle, cargo) {
   if(!plate) return;
-  var h = getHistory();
-  h[plate.replace(/\s/g,'')] = { company:company, vehicle:vehicle, cargo:cargo, updatedAt: new Date().toISOString() };
-  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch(e) {}
+  var key = plate.replace(/\s/g,'');
+  var entry = { company:company, vehicle:vehicle, cargo:cargo, updatedAt: new Date().toISOString() };
+  plateHistoryCache[key] = entry;
+  // Firebaseに保存（全端末に即反映）
+  fbDB.ref('plate_history/'+key).set(entry).catch(function(e){ console.warn('history save err:', e); });
+  // localStorageにもバックアップ
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(plateHistoryCache)); } catch(e) {}
+}
+function startHistoryListener() {
+  fbDB.ref('plate_history').on('value', function(snapshot) {
+    var d = snapshot.val();
+    plateHistoryCache = d || {};
+    // localStorageにバックアップ
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(plateHistoryCache)); } catch(e) {}
+    renderHistory();
+  });
+  // 初期値はlocalStorageから読み込む（Firebase接続前の高速表示）
+  try {
+    var local = JSON.parse(localStorage.getItem(HISTORY_KEY)||'{}');
+    if(Object.keys(local).length > 0 && Object.keys(plateHistoryCache).length === 0) {
+      plateHistoryCache = local;
+    }
+  } catch(e) {}
 }
 // ===== 車番4分割入力 =====
 // 日本語IME変換中フラグ（フィールドIDごと）
@@ -3772,7 +3838,10 @@ function renderHistory() {
 }
 function clearHistory() {
   if(!confirm('前回登録データを全て削除します。よろしいですか？')) return;
+  plateHistoryCache = {};
   try { localStorage.removeItem(HISTORY_KEY); } catch(e) {}
+  // Firebaseからも削除
+  fbDB.ref('plate_history').remove().catch(function(e){ console.warn('history clear err:', e); });
   renderHistory();
 }
 
@@ -3800,6 +3869,7 @@ function geocodeAddress() {
       resEl.className = 'geo-result ok';
       resEl.textContent = '✅ 座標を取得しました\n住所：'+data[0].properties.title+'\n緯度：'+lat.toFixed(6)+'　経度：'+lng.toFixed(6);
       try { localStorage.setItem('mabuchi_cfg', JSON.stringify(CFG)); } catch(e) {}
+      fbDB.ref('settings/config').set(CFG).catch(function(e){ console.warn('CFG save err:', e); });
     } else {
       resEl.className = 'geo-result ng';
       resEl.textContent = '❌ 住所が見つかりませんでした。\n入力例：愛知県弥富市楠3-9-1\n番地まで入力すると精度が上がります。';
@@ -3826,6 +3896,7 @@ function useCurrentGPS() {
     resEl.className = 'geo-result ok';
     resEl.textContent = '✅ 現在地を工場座標に設定しました\n緯度：'+lat.toFixed(6)+'　経度：'+lng.toFixed(6)+'\n精度：±'+Math.round(pos.coords.accuracy)+'m';
     try { localStorage.setItem('mabuchi_cfg', JSON.stringify(CFG)); } catch(e) {}
+    fbDB.ref('settings/config').set(CFG).catch(function(e){ console.warn('CFG save err:', e); });
   }, function(err){
     var msgs=['','位置情報の使用が許可されていません','位置情報を取得できませんでした','タイムアウトしました'];
     resEl.className = 'geo-result ng';
@@ -4381,6 +4452,10 @@ function init() {
 
   // Firebase リアルタイムリスナー起動（スマホ↔PC 同期）
   startFirebaseListener();
+  // Firebase 設定リスナー起動（設定変更を全端末に即反映）
+  startCfgListener();
+  // Firebase 車番履歴リスナー起動（全端末で履歴を共有）
+  startHistoryListener();
 
   setInterval(renderAll, 60000);
   renderAll();
