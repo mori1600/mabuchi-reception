@@ -4570,13 +4570,7 @@ function setSort(s) {
       if(currentSort==='arrival'){
         waiting.forEach(function(v,i){html+=makeCard(v,i+1);});
       } else {
-        var groups={};
-        waiting.forEach(function(v){var k=v.location||'未定';if(!groups[k])groups[k]=[];groups[k].push(v);});
-        var pos=1;
-        var order=CFG.locations.concat(['未定']);
-        order.forEach(function(key){
-          if(groups[key]){html+='<div class="group-header">'+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){html+=makeCard(v,pos++);});}
-        });
+        html = groupByLocation(waiting, makeCard);
       }
       mainEl.innerHTML=html;
     }
@@ -4605,6 +4599,31 @@ function setSort(s) {
       renderAll();
     }
   }
+}
+
+// ===== 場所別グルーピング（共通） =====
+// CFG.locationsの順を優先しつつ、そこに含まれない場所名も必ず出す
+function groupByLocation(list, makeCardFn) {
+  var groups = {};
+  list.forEach(function(v){
+    var k = (v.location && v.location.trim()) ? v.location.trim() : '未定';
+    if(!groups[k]) groups[k] = [];
+    groups[k].push(v);
+  });
+  // 順番: CFG.locationsの定義順 → CFG.locationsに無い場所名 → 未定
+  var defined = (CFG.locations || []).filter(function(k){ return k !== '未定'; });
+  var inData   = Object.keys(groups);
+  var extra    = inData.filter(function(k){ return k !== '未定' && defined.indexOf(k) < 0; });
+  var order    = defined.concat(extra);
+  if(groups['未定']) order.push('未定');
+  var html = '';
+  var pos  = 1;
+  order.forEach(function(key){
+    if(!groups[key]) return;
+    html += '<div class="group-header">'+key+'（'+groups[key].length+'台）</div>';
+    groups[key].forEach(function(v){ html += makeCardFn(v, pos++); });
+  });
+  return html;
 }
 
 // ===== タグ生成 =====
@@ -4803,14 +4822,7 @@ function renderAll() {
       if(currentSort==='arrival'){
         waiting.forEach(function(v,i){html+=makeCard(v,i+1);});
       } else {
-        // 場所別
-        var groups={};
-        waiting.forEach(function(v){var k=v.location||'未定';if(!groups[k])groups[k]=[];groups[k].push(v);});
-        var pos=1;
-        var order=CFG.locations.concat(['未定']);
-        order.forEach(function(key){
-          if(groups[key]){html+='<div class="group-header">'+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){html+=makeCard(v,pos++);}); }
-        });
+        html = groupByLocation(waiting, makeCard);
       }
       mainEl.innerHTML=html;
     }
@@ -4938,14 +4950,7 @@ function renderListForDate(list) {
   if(currentSort==='arrival') {
     waiting.forEach(function(v,i){wHtml+=makeViewCard(v,i+1);});
   } else {
-    // 場所別
-    var groups={};
-    waiting.forEach(function(v){var k=v.location||'未定';if(!groups[k])groups[k]=[];groups[k].push(v);});
-    var pos=1;
-    var order=CFG.locations.concat(['未定']);
-    order.forEach(function(key){
-      if(groups[key]){wHtml+='<div class="group-header">'+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){wHtml+=makeViewCard(v,pos++);});}
-    });
+    wHtml = groupByLocation(waiting, makeViewCard);
   }
   if(mainEl) mainEl.innerHTML = wHtml || '<div class="empty-state"><div class="empty-icon"></div><div>待機中のまま終了した車両はありません</div></div>';
   // 完了カラム（受付時刻の逆順、ボタンなし）
