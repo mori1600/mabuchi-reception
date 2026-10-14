@@ -4645,7 +4645,8 @@ function makeCard(v,pos) {
 }
 
 // ===== 完了カード =====
-function makeDoneCard(v) {
+// showEditBtn: trueのとき「時間修正」ボタンを表示（今日のデータのみ）
+function makeDoneCard(v, showEditBtn) {
   var editLogHtml = '';
   if(v.editLog && v.editLog.length > 0) {
     var logItems = v.editLog.map(function(l){
@@ -4658,13 +4659,19 @@ function makeDoneCard(v) {
     +'<div class="num-badge" style="background:#028090;">完</div>'
     +'<div class="card-info" style="flex:1;">'
       +'<div class="card-company">'+v.company+'</div>'
-      +'<div class="card-detail"><span class="tag">'+v.vehicle+'</span>'+cargoTag(v.cargo)+(v.isNight?'<span class="tag night-t">夜間</span>':'')+'</div>'
+      +'<div class="card-detail">'
+        +'<span class="tag">'+v.vehicle+'</span>'
+        +cargoTag(v.cargo)
+        +(v.location?'<span class="tag loc">'+v.location+'</span>':'')
+        +(v.isNight?'<span class="tag night-t">夜間</span>':'')
+      +'</div>'
+      +(v.client?'<div style="font-size:10px;color:#028090;margin-top:2px;">'+v.client+'</div>':'')
       +'<div class="card-time">受付 '+v.timeStr+'　車番：'+v.plate+(v.waitMin!==null?'　<span style="color:#028090;font-weight:bold;">待ち'+v.waitMin+'分</span>':'')+(v.note?'　備考：'+v.note:'')+'</div>'
       +editLogHtml
     +'</div>'
-    +'<div class="card-actions">'
-      +'<button class="btn btn-reorder" onclick="openEditWaitModal('+v.id+')" style="font-size:11px;padding:4px 8px;">時間修正</button>'
-    +'</div>'
+    +(showEditBtn!==false
+      ?'<div class="card-actions"><button class="btn btn-reorder" onclick="openEditWaitModal('+v.id+')" style="font-size:11px;padding:4px 8px;">時間修正</button></div>'
+      :'')
   +'</div>';
 }
 
@@ -4893,24 +4900,43 @@ function switchViewDateListener() {
     renderListForDate(list);
   });
 }
+// 過去日付閲覧用カード（ボタンなし・全情報表示）
+function makeViewCard(v, pos) {
+  return '<div class="waiting-card" style="border-left:4px solid #94A3B8;">'
+    +'<div class="num-badge" style="background:#94A3B8;">'+pos+'</div>'
+    +'<div class="card-info" style="flex:1;">'
+      +'<div class="card-company">'+v.company+'</div>'
+      +'<div class="card-detail">'
+        +'<span class="tag">'+v.vehicle+'</span>'
+        +cargoTag(v.cargo)
+        +(v.location?'<span class="tag loc">'+v.location+'</span>':'<span class="tag" style="color:#94A3B8;">場所未設定</span>')
+        +(v.isNight?'<span class="tag night-t">夜間</span>':'')
+      +'</div>'
+      +(v.client?'<div style="font-size:10px;color:#028090;margin-top:2px;">'+v.client+'</div>':'')
+      +'<div class="card-time">受付 '+v.timeStr+'　車番：'+v.plate+(v.note?'　備考：'+v.note:'')+'</div>'
+    +'</div>'
+  +'</div>';
+}
+
 function renderListForDate(list) {
   var waiting = list.filter(function(v){return v.status==='waiting';});
   var done = list.filter(function(v){return v.status==='done';});
-  document.getElementById('list-count').textContent = waiting.length+'件';
+  document.getElementById('list-count').textContent = (waiting.length+done.length)+'件';
   var ob = document.getElementById('over-badge'); if(ob) ob.style.display='none';
   var mainEl = document.getElementById('main-list');
   var doneEl = document.getElementById('done-list');
   var doneCount = document.getElementById('done-count');
-  // 待機中カラム
+  // データなし
   if(!list.length) {
     if(mainEl) mainEl.innerHTML = '<div class="empty-state"><div class="empty-icon"></div><div>この日のデータはありません</div></div>';
     if(doneEl) doneEl.innerHTML = '<div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div>';
     if(doneCount) doneCount.textContent = '';
     return;
   }
+  // 待機中カラム（過去日付はボタンなし閲覧用カード）
   var wHtml = '';
   if(currentSort==='arrival') {
-    waiting.forEach(function(v,i){wHtml+=makeCard(v,i+1);});
+    waiting.forEach(function(v,i){wHtml+=makeViewCard(v,i+1);});
   } else {
     // 場所別
     var groups={};
@@ -4918,17 +4944,17 @@ function renderListForDate(list) {
     var pos=1;
     var order=CFG.locations.concat(['未定']);
     order.forEach(function(key){
-      if(groups[key]){wHtml+='<div class="group-header">'+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){wHtml+=makeCard(v,pos++);}); }
+      if(groups[key]){wHtml+='<div class="group-header">'+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){wHtml+=makeViewCard(v,pos++);});}
     });
   }
-  if(mainEl) mainEl.innerHTML = wHtml || '<div class="empty-state"><div class="empty-icon"></div><div>待機中の車両はありません</div></div>';
-  // 完了カラム（受付時刻の逆順）
+  if(mainEl) mainEl.innerHTML = wHtml || '<div class="empty-state"><div class="empty-icon"></div><div>待機中のまま終了した車両はありません</div></div>';
+  // 完了カラム（受付時刻の逆順、ボタンなし）
   if(doneCount) doneCount.textContent = done.length ? '（'+done.length+'台）' : '';
   if(!done.length) {
     if(doneEl) doneEl.innerHTML = '<div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div>';
   } else {
     var sortedDone = done.slice().sort(function(a,b){return b.id-a.id;});
-    if(doneEl) doneEl.innerHTML = sortedDone.map(makeDoneCard).join('');
+    if(doneEl) doneEl.innerHTML = sortedDone.map(function(v){return makeDoneCard(v,false);}).join('');
   }
 }
 
