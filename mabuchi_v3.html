@@ -3161,7 +3161,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   <div class="plate-preview" id="nf-plate-preview"></div>
   <input type="hidden" id="nf-plate">
 </div>
-<div class="form-group"> <label>会社名<span class="required">必須</span></label> <input type="text" id="nf-company" placeholder="例：〇〇運輸株式会社"> </div> <div class="form-group"> <label>車種<span class="required">必須</span></label> <select id="nf-vehicle"></select> </div> <div class="form-group"> <label>荷役方法<span class="required">必須</span></label> <select id="nf-cargo"></select> </div> <div class="form-group"> <label>備考（任意）</label> <input type="text" id="nf-note" placeholder="重量物あり、要注意など"> </div> <button class="submit-btn night-submit" onclick="submitNightForm()"> 夜間受付を登録する</button> </div> </div> <div class="complete-screen" id="night-complete-area"> <div class="complete-icon"></div> <div class="complete-num" id="nc-num">—</div> <div class="complete-label">番目にご案内します</div> <div class="info-row"><span>会社名</span><strong id="nc-company">—</strong></div> <div class="info-row"><span>車両番号</span><strong id="nc-plate">—</strong></div> <div class="info-row"><span>受付時刻</span><strong id="nc-time">—</strong></div> <div class="notice-box"> 夜間受付完了。翌朝スタッフが到着順に登録します。</div> <button class="submit-btn night-submit" style="margin-top:12px;" onclick="resetNightForm()">別の車両を登録する</button> </div>
+<div class="form-group"> <label>会社名<span class="required">必須</span></label> <input type="text" id="nf-company" placeholder="例：〇〇運輸株式会社"> </div> <div class="form-group"> <label>車種<span class="required">必須</span></label> <select id="nf-vehicle"></select> </div> <div class="form-group"> <label>荷役方法<span class="required">必須</span></label> <select id="nf-cargo"></select> </div> <div class="form-group"> <label>備考（任意）</label> <input type="text" id="nf-note" placeholder="重量物あり、要注意など"> </div> <button class="submit-btn night-submit" onclick="submitNightForm()"> 夜間受付を登録する</button> </div> </div> <div class="complete-screen" id="night-complete-area"> <div class="complete-icon"></div> <div id="night-complete-queuenum-area"> <div class="complete-num" id="nc-num">—</div> <div class="complete-label">番目にご案内します</div> </div> <div class="info-row"><span>会社名</span><strong id="nc-company">—</strong></div> <div class="info-row"><span>車両番号</span><strong id="nc-plate">—</strong></div> <div class="info-row"><span>受付時刻</span><strong id="nc-time">—</strong></div> <div class="notice-box"> 夜間受付完了。翌朝スタッフが到着順に登録します。</div> <button class="submit-btn night-submit" style="margin-top:12px;" onclick="resetNightForm()">別の車両を登録する</button> </div>
 </div>
 
 <!-- ========== 管理画面 ========== -->
@@ -3186,7 +3186,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   <div class="plate-preview" id="f-plate-preview"></div>
   <input type="hidden" id="f-plate">
 </div>
-<div class="form-group"> <label>会社名<span class="required">必須</span></label> <input type="text" id="f-company" placeholder="例：〇〇運輸株式会社" style="font-size:16px;"> </div> <div class="form-group"> <label>車種<span class="required">必須</span></label> <select id="f-vehicle" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷役方法<span class="required">必須</span></label> <select id="f-cargo" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷下ろし場所（未定でも可）</label> <select id="f-location" style="font-size:16px;"></select> </div> <div class="form-group" id="f-yokohama-group" style="display:none;"> <label>客先名・案件名（任意）</label> <input type="text" id="f-client" placeholder="例：YKKAP 名古屋向け" style="font-size:16px;"> </div> <div class="form-group"> <label>備考（任意）</label> <input type="text" id="f-note" placeholder="重量物あり、要注意など" style="font-size:16px;"> </div> <button class="submit-btn" onclick="submitForm()" style="font-size:16px;padding:15px;">受付登録する</button> </div> <div class="complete-screen" id="complete-area"> <div class="complete-icon"></div> <div class="complete-num" id="c-num">—</div> <div class="complete-label">番目にご案内します</div> <div class="est-wait" id="c-estwait" style="display:none;"></div> <div class="info-row"><span>会社名</span><strong id="c-company">—</strong></div> <div class="info-row"><span>車両番号</span><strong id="c-plate">—</strong></div> <div class="info-row"><span>車種</span><strong id="c-vehicle">—</strong></div> <div class="info-row"><span>荷役方法</span><strong id="c-cargo">—</strong></div> <div class="info-row"><span>受付時刻</span><strong id="c-time">—</strong></div> <div class="notice-box"> 順番が来ましたらスタッフがお呼びします。そのまま車内でお待ちください。</div> <button class="submit-btn" style="margin-top:12px;font-size:15px;" onclick="resetForm()">別の車両を登録する</button> </div>
+<div class="form-group"> <label>会社名<span class="required">必須</span></label> <input type="text" id="f-company" placeholder="例：〇〇運輸株式会社" style="font-size:16px;"> </div> <div class="form-group"> <label>車種<span class="required">必須</span></label> <select id="f-vehicle" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷役方法<span class="required">必須</span></label> <select id="f-cargo" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷下ろし場所（未定でも可）</label> <select id="f-location" style="font-size:16px;"></select> </div> <div class="form-group" id="f-yokohama-group" style="display:none;"> <label>客先名・案件名（任意）</label> <input type="text" id="f-client" placeholder="例：YKKAP 名古屋向け" style="font-size:16px;"> </div> <div class="form-group"> <label>備考（任意）</label> <input type="text" id="f-note" placeholder="重量物あり、要注意など" style="font-size:16px;"> </div> <button class="submit-btn" onclick="submitForm()" style="font-size:16px;padding:15px;">受付登録する</button> </div> <div class="complete-screen" id="complete-area"> <div class="complete-icon"></div> <div id="complete-queuenum-area"> <div class="complete-num" id="c-num">—</div> <div class="complete-label">番目にご案内します</div> </div> <div class="est-wait" id="c-estwait" style="display:none;"></div> <div class="info-row"><span>会社名</span><strong id="c-company">—</strong></div> <div class="info-row"><span>車両番号</span><strong id="c-plate">—</strong></div> <div class="info-row"><span>車種</span><strong id="c-vehicle">—</strong></div> <div class="info-row"><span>荷役方法</span><strong id="c-cargo">—</strong></div> <div class="info-row"><span>受付時刻</span><strong id="c-time">—</strong></div> <div class="notice-box"> 順番が来ましたらスタッフがお呼びします。そのまま車内でお待ちください。</div> <button class="submit-btn" style="margin-top:12px;font-size:15px;" onclick="resetForm()">別の車両を登録する</button> </div>
 </div>
 
 <!-- ========== 集計 ========== -->
@@ -3245,6 +3245,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     <div class="setting-row">
       <div><div class="setting-label">推定待ち時間の表示</div><div class="setting-sub">横浜はOFF推奨（荷下ろし時間が一品一様のため）</div></div>
       <label class="toggle"><input type="checkbox" id="cfg-estwait" checked onchange="saveCfg()"><span class="slider"></span></label>
+    </div>
+    <div class="setting-row">
+      <div><div class="setting-label">受付番号（何番目）の表示</div><div class="setting-sub">OFFにすると登録完了画面に順番が表示されません（横浜向け）</div></div>
+      <label class="toggle"><input type="checkbox" id="cfg-show-queue-num" checked onchange="saveCfg()"><span class="slider"></span></label>
     </div>
     <div class="setting-row">
       <div><div class="setting-label">1件あたり荷下ろし時間（分）</div><div class="setting-sub">推定待ち時間の計算に使用</div></div>
@@ -3389,6 +3393,7 @@ var CFG = {
   gpsEnabled: true,
   gpsRadius: 100,
   estWaitEnabled: true,
+  showQueueNum: true,
   unloadMin: 30,
   warnMin: 30,
   locations: ['1番バース','2番バース','3番バース','軒下','屋外ヤード'],
@@ -3414,6 +3419,7 @@ function saveCfg() {
   CFG.gpsEnabled   = document.getElementById('cfg-gps').checked;
   CFG.gpsRadius    = parseInt(document.getElementById('cfg-gps-radius').value) || 100;
   CFG.estWaitEnabled = document.getElementById('cfg-estwait').checked;
+  CFG.showQueueNum   = document.getElementById('cfg-show-queue-num').checked;
   CFG.unloadMin    = parseInt(document.getElementById('cfg-unload-min').value) || 30;
   CFG.warnMin      = parseInt(document.getElementById('cfg-warn-min').value) || 30;
   CFG.lat = parseFloat(document.getElementById('cfg-lat').value) || CFG.lat;
@@ -3448,6 +3454,7 @@ function refreshSettingUI() {
   document.getElementById('cfg-gps').checked = CFG.gpsEnabled;
   document.getElementById('cfg-gps-radius').value = CFG.gpsRadius;
   document.getElementById('cfg-estwait').checked = CFG.estWaitEnabled;
+  document.getElementById('cfg-show-queue-num').checked = CFG.showQueueNum !== false;
   document.getElementById('cfg-unload-min').value = CFG.unloadMin;
   document.getElementById('cfg-warn-min').value = CFG.warnMin;
   document.getElementById('cfg-client-field').checked = CFG.clientField;
@@ -4045,6 +4052,8 @@ function submitForm() {
   var estMin=pos*CFG.unloadMin;
   document.getElementById('form-area').style.display='none';
   document.getElementById('complete-area').style.display='block';
+  var qnArea=document.getElementById('complete-queuenum-area');
+  if(qnArea) qnArea.style.display = CFG.showQueueNum !== false ? '' : 'none';
   document.getElementById('c-num').textContent=pos;
   document.getElementById('c-company').textContent=company;
   document.getElementById('c-plate').textContent=plate;
@@ -4078,6 +4087,8 @@ function submitNightForm() {
   var pos=vehicles.filter(function(v){return v.status==='waiting';}).length;
   document.getElementById('night-form-area').style.display='none';
   document.getElementById('night-complete-area').style.display='block';
+  var nqnArea=document.getElementById('night-complete-queuenum-area');
+  if(nqnArea) nqnArea.style.display = CFG.showQueueNum !== false ? '' : 'none';
   document.getElementById('nc-num').textContent=pos;
   document.getElementById('nc-company').textContent=company;
   document.getElementById('nc-plate').textContent=plate;
