@@ -3125,6 +3125,8 @@ input:checked + .slider:before { transform: translateX(20px); }
   .stat-num { font-size: 19px; }
   .waiting-card { flex-wrap: wrap; }
   .card-actions { flex-direction: row; width: 100%; }
+  /* 待機一覧：スマホでは縦積み */
+  #panel-list .list-columns { flex-direction: column !important; }
 }
 </style>
 </head>
@@ -3166,9 +3168,33 @@ input:checked + .slider:before { transform: translateX(20px); }
 </div>
 
 <!-- ========== 管理画面 ========== -->
-<div id="panel-list" class="panel content"> <div class="list-header"> <h2>待機一覧（管理画面）</h2> <div style="display:flex;gap:5px;align-items:center;"> <span class="count-badge" id="list-count">0件</span> <span class="alert-badge" id="over-badge" style="display:none;"></span> </div> </div> <div class="sort-btns"> <button class="sort-btn active" id="sort-arrival"  onclick="setSort('arrival')">受付順</button> <button class="sort-btn"        id="sort-cargo"    onclick="setSort('cargo')">荷役方法別</button> <button class="sort-btn"        id="sort-location" onclick="setSort('location')">場所別</button> </div> <div id="main-list"> <div class="empty-state"><div class="empty-icon"></div><div>現在待機中の車両はありません</div></div> </div>
+<div id="panel-list" class="panel content">
+  <!-- 日付ナビゲーション -->
+  <div id="date-nav" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0 6px;background:#f0f4f8;border-radius:10px;margin-bottom:10px;">
+    <button onclick="shiftViewDate(-1)" style="background:#1E3A5F;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:18px;cursor:pointer;line-height:1;">◀</button>
+    <div style="text-align:center;">
+      <div id="view-date-label" style="font-size:16px;font-weight:bold;color:#1E3A5F;min-width:120px;"></div>
+      <div id="today-indicator" style="font-size:11px;color:#028090;"></div>
+    </div>
+    <button onclick="shiftViewDate(+1)" style="background:#1E3A5F;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:18px;cursor:pointer;line-height:1;">▶</button>
+    <button onclick="jumpToToday()" id="btn-go-today" style="background:#028090;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;">今日</button>
+  </div>
+  <div class="list-header"> <h2>待機一覧（管理画面）</h2> <div style="display:flex;gap:5px;align-items:center;"> <span class="count-badge" id="list-count">0件</span> <span class="alert-badge" id="over-badge" style="display:none;"></span> </div> </div> <div class="sort-btns"> <button class="sort-btn active" id="sort-arrival"  onclick="setSort('arrival')">受付順</button> <button class="sort-btn"        id="sort-cargo"    onclick="setSort('cargo')">荷役方法別</button> <button class="sort-btn"        id="sort-location" onclick="setSort('location')">場所別</button> </div>
+  <!-- 左右2カラム：待機中｜完了 -->
+  <div class="list-columns" style="display:flex;gap:10px;align-items:flex-start;">
+    <!-- 左：待機中 -->
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:12px;font-weight:bold;color:#1E3A5F;padding:6px 8px;background:#EFF6FF;border-radius:8px 8px 0 0;border-left:4px solid #1E3A5F;">🚛 待機中</div>
+      <div id="main-list"><div class="empty-state"><div class="empty-icon"></div><div>現在待機中の車両はありません</div></div></div>
+    </div>
+    <!-- 右：完了済み -->
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:12px;font-weight:bold;color:#028090;padding:6px 8px;background:#F0FDFA;border-radius:8px 8px 0 0;border-left:4px solid #028090;">✅ 完了済み <span id="done-count" style="font-size:11px;font-weight:normal;color:#94A3B8;"></span></div>
+      <div id="done-list"><div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div></div>
+    </div>
+  </div>
 <div style="text-align:right;padding:8px 0 4px;">
-  <button onclick="clearTodayData()" style="font-size:11px;padding:5px 10px;background:#C0392B;color:#fff;border:none;border-radius:6px;cursor:pointer;">🗑 本日データをリセット</button>
+  <button onclick="clearViewDateData()" style="font-size:11px;padding:5px 10px;background:#C0392B;color:#fff;border:none;border-radius:6px;cursor:pointer;">🗑 表示中の日付のデータをリセット</button>
 </div>
 </div>
 
@@ -3187,11 +3213,53 @@ input:checked + .slider:before { transform: translateX(20px); }
   <div class="plate-preview" id="f-plate-preview"></div>
   <input type="hidden" id="f-plate">
 </div>
-<div class="form-group"> <label>会社名<span class="required">必須</span></label> <input type="text" id="f-company" placeholder="例：〇〇運輸株式会社" style="font-size:16px;"> </div> <div class="form-group"> <label>車種<span class="required">必須</span></label> <select id="f-vehicle" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷役方法<span class="required">必須</span></label> <select id="f-cargo" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷下ろし場所（未定でも可）</label> <select id="f-location" style="font-size:16px;"></select> </div> <div class="form-group" id="f-yokohama-group" style="display:none;"> <label>客先名・案件名（任意）</label> <input type="text" id="f-client" placeholder="例：YKKAP 名古屋向け" style="font-size:16px;"> </div> <div class="form-group"> <label>備考（任意）</label> <input type="text" id="f-note" placeholder="重量物あり、要注意など" style="font-size:16px;"> </div> <button class="submit-btn" onclick="submitForm()" style="font-size:16px;padding:15px;">受付登録する</button> </div> <div class="complete-screen" id="complete-area"> <div class="complete-icon"></div> <div id="complete-queuenum-area"> <div class="complete-num" id="c-num">—</div> <div class="complete-label">番目にご案内します</div> </div> <div class="est-wait" id="c-estwait" style="display:none;"></div> <div class="info-row"><span>会社名</span><strong id="c-company">—</strong></div> <div class="info-row"><span>車両番号</span><strong id="c-plate">—</strong></div> <div class="info-row"><span>車種</span><strong id="c-vehicle">—</strong></div> <div class="info-row"><span>荷役方法</span><strong id="c-cargo">—</strong></div> <div class="info-row"><span>受付時刻</span><strong id="c-time">—</strong></div> <div class="notice-box"> 順番が来ましたらスタッフがお呼びします。そのまま車内でお待ちください。</div> <button class="submit-btn" style="margin-top:12px;font-size:15px;" onclick="resetForm()">別の車両を登録する</button> </div>
+<div class="form-group"> <label>会社名<span class="required">必須</span></label> <input type="text" id="f-company" placeholder="例：〇〇運輸株式会社" style="font-size:16px;"> </div> <div class="form-group"> <label>車種<span class="required">必須</span></label> <select id="f-vehicle" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷役方法<span class="required">必須</span></label> <select id="f-cargo" style="font-size:16px;"></select> </div> <div class="form-group"> <label>荷下ろし場所（未定でも可）</label> <select id="f-location" style="font-size:16px;"></select> </div> <div class="form-group" id="f-yokohama-group" style="display:none;"> <label>客先名・案件名（任意）</label> <input type="text" id="f-client" placeholder="例：YKKAP 名古屋向け" style="font-size:16px;"> </div> <div class="form-group"> <label>備考（任意）</label> <input type="text" id="f-note" placeholder="重量物あり、要注意など" style="font-size:16px;"> </div> <button class="submit-btn" onclick="submitForm()" style="font-size:16px;padding:15px;">受付登録する</button> </div> <div class="complete-screen" id="complete-area">
+  <div class="complete-icon"></div>
+  <div id="complete-queuenum-area">
+    <div class="complete-num" id="c-num">—</div>
+    <div class="complete-label">番目にご案内します</div>
+  </div>
+  <div class="est-wait" id="c-estwait" style="display:none;"></div>
+  <div class="info-row"><span>会社名</span><strong id="c-company">—</strong></div>
+  <div class="info-row"><span>車両番号</span><strong id="c-plate">—</strong></div>
+  <div class="info-row"><span>車種</span><strong id="c-vehicle">—</strong></div>
+  <div class="info-row"><span>荷役方法</span><strong id="c-cargo">—</strong></div>
+  <div class="info-row"><span>受付時刻</span><strong id="c-time">—</strong></div>
+  <div class="notice-box">順番が来ましたらスタッフがお呼びします。そのまま車内でお待ちください。</div>
+  <!-- 複数台登録ボタン（設定ONのときのみ表示） -->
+  <div id="multi-reg-btn-area" style="display:none;margin-top:12px;">
+    <button class="submit-btn" style="font-size:15px;background:#1E3A5F;" onclick="addAnotherVehicle()">🚛 もう1台登録する</button>
+  </div>
+  <!-- このセッションで登録した車両の一覧（複数台登録ONかつ2台以上のとき） -->
+  <div id="session-list-area" style="display:none;margin-top:16px;">
+    <div style="font-size:13px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #EFF6FF;">📋 このQRで登録した車両</div>
+    <div id="session-list-cards"></div>
+  </div>
+  <button class="submit-btn" style="margin-top:12px;font-size:15px;background:#64748B;" onclick="resetFormFull()">✖ 受付を終了する</button>
+</div>
 </div>
 
 <!-- ========== 集計 ========== -->
-<div id="panel-stats" class="panel content"> <div class="stats-grid g4" style="margin-bottom:10px;"> <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">本日総受付台数</div></div> <div class="stat-card"><div class="stat-num" id="s-done">0</div><div class="stat-label">完了台数</div></div> <div class="stat-card"><div class="stat-num" id="s-avg">—</div><div class="stat-label">平均待ち時間(分)</div></div> <div class="stat-card"><div class="stat-num" id="s-max">—</div><div class="stat-label">最長待ち時間(分)</div></div> </div> <div class="stats-grid g4" style="margin-bottom:12px;"> <div class="stat-card"><div class="stat-num" id="s-night">0</div><div class="stat-label">夜間受付台数</div></div> <div class="stat-card"><div class="stat-num red" id="s-over">0</div><div class="stat-label" id="s-over-label">30分超え件数</div></div> </div> <div class="card" style="margin-bottom:8px;"> <div style="font-size:12px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;">荷役方法別 台数</div> <div id="cargo-stats"><div style="font-size:11px;color:#94A3B8;">データなし</div></div> </div> <div class="card" style="margin-bottom:8px;"> <div style="font-size:12px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;">車種別 台数</div> <div id="vehicle-stats"><div style="font-size:11px;color:#94A3B8;">データなし</div></div> </div> <button class="csv-btn" onclick="downloadCSV()"> CSVダウンロード（物流効率化法対応）</button> <div style="font-size:10px;color:#94A3B8;text-align:center;margin-top:5px;">荷待ち時間記録データとして国交省報告に活用可能</div>
+<div id="panel-stats" class="panel content">
+  <!-- 期間指定UI -->
+  <div style="background:#f0f4f8;border-radius:10px;padding:10px 12px;margin-bottom:12px;">
+    <div style="font-size:13px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;">📅 集計期間</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+      <button class="sort-btn active" id="stats-range-month" onclick="setStatsRange('month')">今月</button>
+      <button class="sort-btn" id="stats-range-week"  onclick="setStatsRange('week')">今週</button>
+      <button class="sort-btn" id="stats-range-today" onclick="setStatsRange('today')">今日</button>
+      <button class="sort-btn" id="stats-range-custom" onclick="setStatsRange('custom')">期間指定</button>
+    </div>
+    <div id="stats-custom-range" style="display:none;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;">
+      <input type="date" id="stats-from" style="border:1px solid #cbd5e1;border-radius:6px;padding:5px 8px;font-size:13px;">
+      <span style="color:#64748B;">〜</span>
+      <input type="date" id="stats-to" style="border:1px solid #cbd5e1;border-radius:6px;padding:5px 8px;font-size:13px;">
+      <button onclick="applyCustomRange()" style="background:#028090;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;">集計</button>
+    </div>
+    <div id="stats-range-label" style="font-size:12px;color:#64748B;margin-top:4px;"></div>
+    <div id="stats-loading" style="font-size:12px;color:#94A3B8;margin-top:4px;display:none;">📊 集計中...</div>
+  </div>
+  <div class="stats-grid g4" style="margin-bottom:10px;"> <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">総受付台数</div></div> <div class="stat-card"><div class="stat-num" id="s-done">0</div><div class="stat-label">完了台数</div></div> <div class="stat-card"><div class="stat-num" id="s-avg">—</div><div class="stat-label">平均待ち時間(分)</div></div> <div class="stat-card"><div class="stat-num" id="s-max">—</div><div class="stat-label">最長待ち時間(分)</div></div> </div> <div class="stats-grid g4" style="margin-bottom:12px;"> <div class="stat-card"><div class="stat-num" id="s-night">0</div><div class="stat-label">夜間受付台数</div></div> <div class="stat-card"><div class="stat-num red" id="s-over">0</div><div class="stat-label" id="s-over-label">30分超え件数</div></div> </div> <div class="card" style="margin-bottom:8px;"> <div style="font-size:12px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;">荷役方法別 台数</div> <div id="cargo-stats"><div style="font-size:11px;color:#94A3B8;">データなし</div></div> </div> <div class="card" style="margin-bottom:8px;"> <div style="font-size:12px;font-weight:bold;color:#1E3A5F;margin-bottom:8px;">車種別 台数</div> <div id="vehicle-stats"><div style="font-size:11px;color:#94A3B8;">データなし</div></div> </div> <button class="csv-btn" onclick="downloadCSVRange()"> CSVダウンロード（物流効率化法対応）</button> <div style="font-size:10px;color:#94A3B8;text-align:center;margin-top:5px;">荷待ち時間記録データとして国交省報告に活用可能</div>
 </div>
 
 <!-- ========== 入口QRタブ ========== -->
@@ -3219,6 +3287,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     <div class="setting-row">
       <div><div class="setting-label">超過警告の閾値（分）</div><div class="setting-sub">この時間を超えると管理画面で赤色警告表示</div></div>
       <input type="number" id="cfg-warn-min" class="setting-input" value="30" min="5" max="120" onchange="saveCfg()">
+    </div>
+    <div class="setting-row">
+      <div><div class="setting-label">🚛 複数台連続登録</div><div class="setting-sub">ONにすると受付完了後に「もう1台登録する」ボタンを表示。同一セッションで登録した全車両の待ち状況を一覧表示します（横浜工場等、複数台同時受付に対応）</div></div>
+      <label class="toggle"><input type="checkbox" id="cfg-multi-reg" onchange="saveCfg()"><span class="slider"></span></label>
     </div>
   </div>
 
@@ -3296,7 +3368,75 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
   </div>
 
-  <!-- ⑤ 車番履歴 -->
+  <!-- ⑤ 勤務時間・休憩設定 -->
+  <div class="setting-section">
+    <h3>⏰ 勤務時間・休憩設定</h3>
+
+    <!-- 始業・終業時刻 -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+      <div style="flex:1;min-width:120px;">
+        <div class="setting-label" style="margin-bottom:4px;">🌅 始業時刻</div>
+        <input type="time" id="cfg-work-start" class="setting-input-wide"
+          style="font-size:15px;padding:6px 8px;"
+          onchange="saveCfg()">
+      </div>
+      <div style="flex:1;min-width:120px;">
+        <div class="setting-label" style="margin-bottom:4px;">🌇 終業時刻</div>
+        <input type="time" id="cfg-work-end" class="setting-input-wide"
+          style="font-size:15px;padding:6px 8px;"
+          onchange="saveCfg()">
+      </div>
+    </div>
+    <div class="setting-sub" style="margin-bottom:12px;">始業時刻前に到着したトラックは、始業時刻からカウント開始します。</div>
+
+    <!-- 休憩時間カウント -->
+    <div class="setting-row" style="margin-bottom:10px;">
+      <div>
+        <div class="setting-label">☕ 休憩時間をカウントしない</div>
+        <div class="setting-sub">ONにすると休憩中の待機時間をカウントから除外します</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="cfg-break-count-enabled" onchange="saveCfg()">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- 休憩時間帯 -->
+    <div id="break-settings-area">
+      <div style="font-size:12px;font-weight:bold;color:#475569;margin-bottom:8px;">休憩時間帯</div>
+      <div id="break-periods-list">
+        <!-- 午前休憩 -->
+        <div class="break-period-row" data-break="0" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px;background:#f8fafc;border-radius:8px;">
+          <div style="font-size:12px;color:#475569;min-width:52px;">午前休憩</div>
+          <input type="time" id="cfg-break-0-start" class="setting-input-wide"
+            style="font-size:13px;padding:4px 6px;flex:1;" onchange="saveCfg()">
+          <span style="font-size:12px;color:#94A3B8;">〜</span>
+          <input type="time" id="cfg-break-0-end" class="setting-input-wide"
+            style="font-size:13px;padding:4px 6px;flex:1;" onchange="saveCfg()">
+        </div>
+        <!-- 昼休憩 -->
+        <div class="break-period-row" data-break="1" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px;background:#f8fafc;border-radius:8px;">
+          <div style="font-size:12px;color:#475569;min-width:52px;">昼休憩</div>
+          <input type="time" id="cfg-break-1-start" class="setting-input-wide"
+            style="font-size:13px;padding:4px 6px;flex:1;" onchange="saveCfg()">
+          <span style="font-size:12px;color:#94A3B8;">〜</span>
+          <input type="time" id="cfg-break-1-end" class="setting-input-wide"
+            style="font-size:13px;padding:4px 6px;flex:1;" onchange="saveCfg()">
+        </div>
+        <!-- 午後休憩 -->
+        <div class="break-period-row" data-break="2" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px;background:#f8fafc;border-radius:8px;">
+          <div style="font-size:12px;color:#475569;min-width:52px;">午後休憩</div>
+          <input type="time" id="cfg-break-2-start" class="setting-input-wide"
+            style="font-size:13px;padding:4px 6px;flex:1;" onchange="saveCfg()">
+          <span style="font-size:12px;color:#94A3B8;">〜</span>
+          <input type="time" id="cfg-break-2-end" class="setting-input-wide"
+            style="font-size:13px;padding:4px 6px;flex:1;" onchange="saveCfg()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑥ 車番履歴 -->
   <div class="setting-section">
     <h3>🕐 車番の自動補完履歴</h3>
     <div class="setting-sub" style="margin-bottom:8px;">車番を入力すると前回の登録情報が自動入力されます。登録済みデータ：</div>
@@ -3397,13 +3537,24 @@ var CFG = {
   cargoTypes: ['フォークリフト可','クレーン必要','手荷役','その他'],
   vehicleTypes: ['トレーラ','10ton平','10tonウイング','4ton平','その他'],
   clientField: false,
-  // QRコード用ベースURL（Netlify等にデプロイ後に設定する）
+  // QRコード用ベースURL
   baseUrl: 'https://mori1600.github.io/mabuchi-reception/mabuchi_v3.html',
   // API連携設定
   apiEnabled: false,
   apiUrl: '',
   apiKey: '',
-  apiFormat: 'json'
+  apiFormat: 'json',
+  // ===== 複数台連続登録 =====
+  multiRegEnabled: false, // true=「もう1台登録する」ボタンを表示
+  // ===== 勤務時間・休憩設定 =====
+  workStart: '08:30',   // 始業時刻
+  workEnd:   '17:30',   // 終業時刻
+  breakCountEnabled: false, // 休憩時間をカウントしない（true=カウントしない）
+  breaks: [
+    { label: '午前休憩', start: '10:00', end: '10:10' },
+    { label: '昼休憩',   start: '12:00', end: '13:00' },
+    { label: '午後休憩', start: '15:00', end: '15:10' }
+  ]
 };
 
 function loadCfg() {
@@ -3429,7 +3580,8 @@ function saveCfg() {
   CFG.gpsEnabled   = document.getElementById('cfg-gps').checked;
   CFG.gpsRadius    = parseInt(document.getElementById('cfg-gps-radius').value) || 100;
   CFG.estWaitEnabled = document.getElementById('cfg-estwait').checked;
-  CFG.showQueueNum   = document.getElementById('cfg-show-queue-num').checked;
+  CFG.showQueueNum      = document.getElementById('cfg-show-queue-num').checked;
+  CFG.multiRegEnabled   = document.getElementById('cfg-multi-reg').checked;
   CFG.unloadMin    = parseInt(document.getElementById('cfg-unload-min').value) || 30;
   CFG.warnMin      = parseInt(document.getElementById('cfg-warn-min').value) || 30;
   CFG.lat = parseFloat(document.getElementById('cfg-lat').value) || CFG.lat;
@@ -3439,6 +3591,15 @@ function saveCfg() {
   CFG.apiUrl     = document.getElementById('cfg-api-url').value.trim();
   CFG.apiKey     = document.getElementById('cfg-api-key').value.trim();
   CFG.apiFormat  = document.getElementById('cfg-api-format').value;
+  // 勤務時間・休憩設定
+  CFG.workStart = document.getElementById('cfg-work-start').value || '08:30';
+  CFG.workEnd   = document.getElementById('cfg-work-end').value   || '17:30';
+  CFG.breakCountEnabled = document.getElementById('cfg-break-count-enabled').checked;
+  CFG.breaks = [
+    { label:'午前休憩', start: document.getElementById('cfg-break-0-start').value || '10:00', end: document.getElementById('cfg-break-0-end').value || '10:10' },
+    { label:'昼休憩',   start: document.getElementById('cfg-break-1-start').value || '12:00', end: document.getElementById('cfg-break-1-end').value || '13:00' },
+    { label:'午後休憩', start: document.getElementById('cfg-break-2-start').value || '15:00', end: document.getElementById('cfg-break-2-end').value || '15:10' }
+  ];
   // ローカルにも保存
   try { localStorage.setItem('mabuchi_cfg', JSON.stringify(CFG)); } catch(e) {}
   // Firebaseにも保存（全端末に即反映）
@@ -3481,6 +3642,7 @@ function refreshSettingUI() {
   document.getElementById('cfg-gps-radius').value = CFG.gpsRadius;
   document.getElementById('cfg-estwait').checked = CFG.estWaitEnabled;
   document.getElementById('cfg-show-queue-num').checked = CFG.showQueueNum !== false;
+  document.getElementById('cfg-multi-reg').checked = CFG.multiRegEnabled || false;
   document.getElementById('cfg-unload-min').value = CFG.unloadMin;
   document.getElementById('cfg-warn-min').value = CFG.warnMin;
   document.getElementById('cfg-client-field').checked = CFG.clientField;
@@ -3491,6 +3653,22 @@ function refreshSettingUI() {
   document.getElementById('cfg-api-url').value = CFG.apiUrl;
   document.getElementById('cfg-api-key').value = CFG.apiKey;
   document.getElementById('cfg-api-format').value = CFG.apiFormat;
+  // 勤務時間・休憩設定
+  document.getElementById('cfg-work-start').value = CFG.workStart || '08:30';
+  document.getElementById('cfg-work-end').value   = CFG.workEnd   || '17:30';
+  document.getElementById('cfg-break-count-enabled').checked = CFG.breakCountEnabled || false;
+  var breaks = CFG.breaks || [
+    { start:'10:00', end:'10:10' },
+    { start:'12:00', end:'13:00' },
+    { start:'15:00', end:'15:10' }
+  ];
+  for(var bi=0; bi<3; bi++) {
+    var br = breaks[bi] || {};
+    var bsEl = document.getElementById('cfg-break-'+bi+'-start');
+    var beEl = document.getElementById('cfg-break-'+bi+'-end');
+    if(bsEl) bsEl.value = br.start || '';
+    if(beEl) beEl.value = br.end   || '';
+  }
   // 警告ラベル更新
   document.getElementById('s-over-label').textContent = CFG.warnMin+'分超え件数';
   // 客先欄
@@ -3927,6 +4105,9 @@ function getQRUrl(tab) {
   var base = (CFG.baseUrl && CFG.baseUrl.trim())
     ? CFG.baseUrl.trim().replace(/\/+$/, '')
     : window.location.href.split('?')[0];
+  // ドライバー向けQRは ?mode=driver でタブを非表示にする
+  if(tab === 'driver') return base + '?mode=driver';
+  if(tab === 'night')  return base + '?mode=driver&tab=night';
   return base + '?tab=' + tab;
 }
 
@@ -4074,6 +4255,8 @@ setInterval(tickQR, 1000);
 // ===== タブ切替 =====
 var TABS = ['qr','night','list','driver','stats','entrance','settings'];
 function switchTab(name) {
+  // ドライバーモード中はタブ切替を無効化
+  if(window.DRIVER_MODE) return;
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
   document.getElementById('panel-'+name).classList.add('active');
@@ -4164,6 +4347,10 @@ function registerVehicle(company,plate,vehicle,cargo,location,note,client,isNigh
 }
 
 // ===== 昼間フォーム =====
+// ===== 複数台登録セッション管理 =====
+var sessionRegistrations = []; // このQRセッションで登録した vehicle ID のリスト
+var sessionListTimer = null;   // リアルタイム更新タイマー
+
 function submitForm() {
   var company=document.getElementById('f-company').value.trim();
   var plate=getPlate('f');
@@ -4174,6 +4361,8 @@ function submitForm() {
   var client=CFG.clientField?document.getElementById('f-client').value.trim():'';
   if(!company||!plate||!vehicle||!cargo){alert('必須項目をすべて入力してください');return;}
   var entry=registerVehicle(company,plate,vehicle,cargo,location,note,client,false);
+  // セッション記録
+  sessionRegistrations.push(entry.id);
   var waiting=vehicles.filter(function(v){return v.status==='waiting';});
   var pos=waiting.findIndex(function(v){return v.id===entry.id;})+1;
   var estMin=pos*CFG.unloadMin;
@@ -4190,8 +4379,36 @@ function submitForm() {
   var estEl=document.getElementById('c-estwait');
   if(CFG.estWaitEnabled){estEl.textContent='⏱ 推定待ち時間：約'+estMin+'分';estEl.style.display='inline-block';}
   else{estEl.style.display='none';}
+  // 複数台登録ボタン表示
+  var mBtn=document.getElementById('multi-reg-btn-area');
+  if(mBtn) mBtn.style.display = CFG.multiRegEnabled ? '' : 'none';
+  // セッション一覧を更新
+  renderSessionList();
+  // リアルタイム更新（10秒ごと）
+  if(sessionListTimer) clearInterval(sessionListTimer);
+  if(CFG.multiRegEnabled) {
+    sessionListTimer = setInterval(renderSessionList, 10000);
+  }
   renderAll();
 }
+
+function addAnotherVehicle() {
+  // フォームをクリアして追加入力（セッション一覧は保持）
+  ['f-company','f-note','f-client','f-plate','f-p1','f-p2','f-p3','f-p4'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['f-vehicle','f-cargo','f-location'].forEach(function(id){document.getElementById(id).value='';});
+  var pv=document.getElementById('f-plate-preview'); if(pv) pv.textContent='';
+  document.getElementById('day-autofill-banner').style.display='none';
+  document.getElementById('form-area').style.display='block';
+  document.getElementById('complete-area').style.display='none';
+}
+
+function resetFormFull() {
+  // セッションを完全リセット
+  sessionRegistrations = [];
+  if(sessionListTimer){ clearInterval(sessionListTimer); sessionListTimer=null; }
+  resetForm();
+}
+
 function resetForm() {
   ['f-company','f-note','f-client','f-plate','f-p1','f-p2','f-p3','f-p4'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   ['f-vehicle','f-cargo','f-location'].forEach(function(id){document.getElementById(id).value='';});
@@ -4199,6 +4416,34 @@ function resetForm() {
   document.getElementById('day-autofill-banner').style.display='none';
   document.getElementById('form-area').style.display='block';
   document.getElementById('complete-area').style.display='none';
+}
+
+function renderSessionList() {
+  if(!CFG.multiRegEnabled || sessionRegistrations.length < 1) {
+    var la=document.getElementById('session-list-area'); if(la) la.style.display='none';
+    return;
+  }
+  var la=document.getElementById('session-list-area');
+  var lc=document.getElementById('session-list-cards');
+  if(!la||!lc) return;
+  // 登録済みIDからvehicleデータを取得（waiting順で待ち順番を計算）
+  var waiting = vehicles.filter(function(v){return v.status==='waiting';});
+  var html = sessionRegistrations.map(function(id) {
+    var v = vehicles.find(function(x){return x.id===id;});
+    if(!v) return '';
+    var pos = waiting.findIndex(function(x){return x.id===id;})+1;
+    var isDone = v.status === 'done';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px;background:'+(isDone?'#F0FFF4':'#EFF6FF')+';border-radius:10px;border-left:4px solid '+(isDone?'#028090':'#1E3A5F')+';">'
+      +'<div style="font-size:22px;font-weight:bold;color:'+(isDone?'#028090':'#1E3A5F')+';min-width:32px;text-align:center;">'+(isDone?'✅':pos+'番')+'</div>'
+      +'<div style="flex:1;">'
+        +'<div style="font-size:14px;font-weight:bold;color:#1E3A5F;">'+v.company+'</div>'
+        +'<div style="font-size:12px;color:#64748B;">車番：'+v.plate+'　受付 '+v.timeStr+'</div>'
+        +(isDone?'<div style="font-size:11px;color:#028090;font-weight:bold;">✓ 荷下ろし完了</div>':'<div style="font-size:11px;color:#94A3B8;">順番が来たらスタッフがお呼びします</div>')
+      +'</div>'
+    +'</div>';
+  }).join('');
+  lc.innerHTML = html || '';
+  la.style.display = sessionRegistrations.length >= 1 ? '' : 'none';
 }
 
 // ===== 夜間フォーム =====
@@ -4237,7 +4482,7 @@ function resetNightForm() {
 function completeVehicle(id) {
   var v=vehicles.find(function(x){return x.id===id;});
   if(!v)return;
-  var waitMin=Math.round((new Date()-v.time)/60000);
+  var waitMin=calcEffectiveWait(v.time, new Date());
   // Firebase更新（リスナーが全端末に反映）
   fbUpdateEntry(id, {status:'done', waitMin:waitMin});
   // ローカルも即時反映（UX向上）
@@ -4292,7 +4537,7 @@ function cargoTag(cargo) {
 
 // ===== 待機カード =====
 function makeCard(v,pos) {
-  var elapsedMin=Math.round((new Date()-v.time)/60000);
+  var elapsedMin=calcEffectiveWait(v.time, new Date());
   var isOver=elapsedMin>=CFG.warnMin;
   var locOpts=CFG.locations.map(function(l){return '<option value="'+l+'"'+(v.location===l?' selected':'')+'>'+l+'</option>';}).join('');
   return '<div class="waiting-card '+(v.isNight?'night-reg':'')+' '+(isOver?'urgent':'')+'">'
@@ -4320,6 +4565,90 @@ function makeCard(v,pos) {
   +'</div>';
 }
 
+// ===== 完了カード =====
+function makeDoneCard(v) {
+  return '<div class="waiting-card" style="opacity:0.65;border-left:4px solid #028090;">'
+    +'<div class="num-badge" style="background:#028090;">✓</div>'
+    +'<div class="card-info">'
+      +'<div class="card-company">'+v.company+'</div>'
+      +'<div class="card-detail"><span class="tag">'+v.vehicle+'</span>'+cargoTag(v.cargo)+(v.isNight?'<span class="tag night-t">🌙 夜間</span>':'')+'</div>'
+      +'<div class="card-time">受付 '+v.timeStr+'　車番：'+v.plate+(v.waitMin!==null?'　<span style="color:#028090;font-weight:bold;">待ち'+v.waitMin+'分</span>':'')+(v.note?'　備考：'+v.note:'')+'</div>'
+    +'</div>'
+  +'</div>';
+}
+
+// ===== 実効待機時間計算 =====
+/**
+ * 受付時刻(fromTime)から現在(toTime)までの「実稼働待機時間」を分単位で返す。
+ * ルール：
+ *  - 始業前の時間はカウントしない（始業時刻からカウント開始）
+ *  - CFG.breakCountEnabled=true の場合、休憩時間はカウントしない
+ *  - 日をまたぐ場合も考慮
+ */
+function hhmm(str) {
+  // "HH:MM" → 分
+  var p = str.split(':');
+  return parseInt(p[0])*60 + parseInt(p[1]);
+}
+function calcEffectiveWait(fromTime, toTime) {
+  if(!fromTime || !toTime) return 0;
+  var from = new Date(fromTime);
+  var to   = new Date(toTime);
+  if(to <= from) return 0;
+
+  var workStartMin = hhmm(CFG.workStart || '08:30');
+  var workEndMin   = hhmm(CFG.workEnd   || '17:30');
+
+  var total = 0;
+  // 1分刻みでカウント（精度と速度のバランス上、受付から完了まで最大1440分）
+  // ただし実際は数時間なので問題なし
+  var cur = new Date(from);
+  // 始業前なら始業時刻から開始
+  var curMin = cur.getHours()*60 + cur.getMinutes();
+  if(curMin < workStartMin) {
+    cur.setHours(Math.floor(workStartMin/60), workStartMin%60, 0, 0);
+    if(cur > to) return 0;
+  }
+
+  // ループは重いので「有効区間の合計」を区間演算で計算
+  // 受付時刻〜現在の各分を「稼働中か」で判定
+  var fromMs = cur.getTime();
+  var toMs   = to.getTime();
+  var diffMin = Math.floor((toMs - fromMs) / 60000);
+  if(diffMin <= 0) return 0;
+
+  // 各分について稼働中かチェック（日をまたぐ場合も対応）
+  var effectiveMin = 0;
+  for(var i = 0; i < diffMin; i++) {
+    var t = new Date(fromMs + i*60000);
+    var tMin = t.getHours()*60 + t.getMinutes();
+    // 終業後はカウントしない
+    if(tMin >= workEndMin) continue;
+    // 始業前はカウントしない（念のため）
+    if(tMin < workStartMin) continue;
+    // 休憩中はカウントしない（設定OFFの場合スキップ）
+    if(CFG.breakCountEnabled && CFG.breaks) {
+      var inBreak = false;
+      for(var b = 0; b < CFG.breaks.length; b++) {
+        var br = CFG.breaks[b];
+        if(!br.start || !br.end) continue;
+        var bs = hhmm(br.start), be = hhmm(br.end);
+        if(tMin >= bs && tMin < be){ inBreak=true; break; }
+      }
+      if(inBreak) continue;
+    }
+    effectiveMin++;
+  }
+  return effectiveMin;
+}
+
+// ===== 日付ナビゲーション（待機一覧） — renderAll() より前に宣言必要 =====
+var viewDate = new Date();
+var viewDateListener = null;
+function isToday(d) {
+  var t = new Date(); return d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth()&&d.getDate()===t.getDate();
+}
+
 // ===== 全描画 =====
 function renderAll() {
   var waiting=vehicles.filter(function(v){return v.status==='waiting';});
@@ -4327,7 +4656,7 @@ function renderAll() {
   var total=vehicles.length;
   var avg=done.length?Math.round(done.reduce(function(s,v){return s+(v.waitMin||0);},0)/done.length):null;
   var over=vehicles.filter(function(v){
-    var e=Math.round((new Date()-v.time)/60000);
+    var e=calcEffectiveWait(v.time, new Date());
     return v.status==='waiting'&&e>=CFG.warnMin;
   }).length;
   var nightCount=vehicles.filter(function(v){return v.isNight;}).length;
@@ -4337,11 +4666,14 @@ function renderAll() {
   if(CFG.estWaitEnabled) document.getElementById('q-avg').textContent=avg!==null?avg:'—';
   else document.getElementById('q-avg').textContent='—';
   document.getElementById('q-count-badge').textContent=waiting.length+'件';
-  document.getElementById('list-count').textContent=waiting.length+'件';
 
-  var ob=document.getElementById('over-badge');
-  if(over>0){ob.textContent='⏰ '+CFG.warnMin+'分超 '+over+'件';ob.style.display='inline';}
-  else{ob.style.display='none';}
+  // 管理一覧の待機件数・アラート：今日を表示中のときのみ更新
+  if(isToday(viewDate)) {
+    document.getElementById('list-count').textContent=waiting.length+'件';
+    var ob=document.getElementById('over-badge');
+    if(over>0){ob.textContent='⏰ '+CFG.warnMin+'分超 '+over+'件';ob.style.display='inline';}
+    else{ob.style.display='none';}
+  }
 
   var miniEl=document.getElementById('mini-list');
   if(!waiting.length){
@@ -4360,50 +4692,166 @@ function renderAll() {
     }).join('');
   }
 
-  var mainEl=document.getElementById('main-list');
-  if(!waiting.length){
-    mainEl.innerHTML='<div class="empty-state"><div class="empty-icon">🚛</div><div>現在待機中の車両はありません</div></div>';
-  } else {
-    var html='';
-    if(currentSort==='arrival'){
-      waiting.forEach(function(v,i){html+=makeCard(v,i+1);});
-    } else if(currentSort==='cargo'){
-      var groups={};
-      waiting.forEach(function(v){if(!groups[v.cargo])groups[v.cargo]=[];groups[v.cargo].push(v);});
-      var pos=1;
-      Object.entries(groups).forEach(function(e){
-        html+='<div class="group-header">🔹 '+e[0]+'（'+e[1].length+'台）</div>';
-        e[1].forEach(function(v){html+=makeCard(v,pos++);});
-      });
+  // 管理一覧の main-list / done-list：今日を表示中のときのみ更新（他の日はリスナーが管理）
+  if(isToday(viewDate)) {
+    var mainEl=document.getElementById('main-list');
+    var doneEl=document.getElementById('done-list');
+    var doneCount=document.getElementById('done-count');
+    // 待機中
+    if(!waiting.length){
+      mainEl.innerHTML='<div class="empty-state"><div class="empty-icon">🚛</div><div>現在待機中の車両はありません</div></div>';
     } else {
-      var groups={};
-      waiting.forEach(function(v){var k=v.location||'未定';if(!groups[k])groups[k]=[];groups[k].push(v);});
-      var pos=1;
-      var order=CFG.locations.concat(['未定']);
-      order.forEach(function(key){
-        if(groups[key]){html+='<div class="group-header">📍 '+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){html+=makeCard(v,pos++);});}
-      });
+      var html='';
+      if(currentSort==='arrival'){
+        waiting.forEach(function(v,i){html+=makeCard(v,i+1);});
+      } else if(currentSort==='cargo'){
+        var groups={};
+        waiting.forEach(function(v){if(!groups[v.cargo])groups[v.cargo]=[];groups[v.cargo].push(v);});
+        var pos=1;
+        Object.entries(groups).forEach(function(e){
+          html+='<div class="group-header">🔹 '+e[0]+'（'+e[1].length+'台）</div>';
+          e[1].forEach(function(v){html+=makeCard(v,pos++);});
+        });
+      } else {
+        var groups={};
+        waiting.forEach(function(v){var k=v.location||'未定';if(!groups[k])groups[k]=[];groups[k].push(v);});
+        var pos=1;
+        var order=CFG.locations.concat(['未定']);
+        order.forEach(function(key){
+          if(groups[key]){html+='<div class="group-header">📍 '+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){html+=makeCard(v,pos++);}); }
+        });
+      }
+      mainEl.innerHTML=html;
     }
-    mainEl.innerHTML=html;
+    // 完了済み
+    var done=vehicles.filter(function(v){return v.status==='done';});
+    if(doneCount) doneCount.textContent = done.length ? '（'+done.length+'台）' : '';
+    if(!done.length){
+      if(doneEl) doneEl.innerHTML='<div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div>';
+    } else {
+      // 完了は受付時刻の逆順（最新を上）
+      var sortedDone = done.slice().sort(function(a,b){return b.id-a.id;});
+      if(doneEl) doneEl.innerHTML = sortedDone.map(makeDoneCard).join('');
+    }
   }
 
-  document.getElementById('s-total').textContent=total;
-  document.getElementById('s-done').textContent=done.length;
-  document.getElementById('s-avg').textContent=avg!==null?avg:'—';
-  document.getElementById('s-max').textContent=done.length?Math.max.apply(null,done.map(function(v){return v.waitMin||0;})):'—';
-  document.getElementById('s-night').textContent=nightCount;
-  document.getElementById('s-over').textContent=over;
+  // 集計パネルは期間指定モードで別途管理するため、renderAll()からは更新しない
+  // （renderStatsPanel() が担当）
 
-  var cargoMap={},vehicleMap={};
-  vehicles.forEach(function(v){cargoMap[v.cargo]=(cargoMap[v.cargo]||0)+1;vehicleMap[v.vehicle]=(vehicleMap[v.vehicle]||0)+1;});
-  function makeBar(map,color){
-    if(!total) return '<div style="font-size:11px;color:#94A3B8;">データなし</div>';
-    return Object.entries(map).map(function(e){
-      return '<div class="bar-row"><div class="bar-label">'+e[0]+'</div><div class="bar-wrap"><div class="bar-fill" style="background:'+color+';width:'+Math.round(e[1]/total*100)+'%;"></div></div><div class="bar-count">'+e[1]+'台</div></div>';
-    }).join('');
+  // 複数台登録セッション一覧をリアルタイム更新
+  if(CFG.multiRegEnabled && sessionRegistrations.length >= 1) {
+    renderSessionList();
   }
-  document.getElementById('cargo-stats').innerHTML=makeBar(cargoMap,'#028090');
-  document.getElementById('vehicle-stats').innerHTML=makeBar(vehicleMap,'#1E3A5F');
+}
+
+// ===== 日付ナビゲーション 関数群 =====
+function dateToKey(d) {
+  return d.getFullYear()+''+('0'+(d.getMonth()+1)).slice(-2)+''+('0'+d.getDate()).slice(-2);
+}
+function keyToDate(k) {
+  return new Date(Number(k.slice(0,4)), Number(k.slice(4,6))-1, Number(k.slice(6,8)));
+}
+function updateViewDateLabel() {
+  var el = document.getElementById('view-date-label');
+  var ind = document.getElementById('today-indicator');
+  var btn = document.getElementById('btn-go-today');
+  var d = viewDate;
+  var y=d.getFullYear(), m=d.getMonth()+1, day=d.getDate();
+  var wdays=['日','月','火','水','木','金','土'];
+  if(el) el.textContent = y+'年'+m+'月'+day+'日（'+wdays[d.getDay()]+'）';
+  if(ind) ind.textContent = isToday(d) ? '● 今日' : '';
+  if(btn) btn.style.display = isToday(d) ? 'none' : '';
+}
+function shiftViewDate(delta) {
+  var d = new Date(viewDate);
+  d.setDate(d.getDate() + delta);
+  viewDate = d;
+  switchViewDateListener();
+}
+function jumpToToday() {
+  viewDate = new Date();
+  switchViewDateListener();
+}
+function switchViewDateListener() {
+  // 前のリスナーを解除
+  if(viewDateListener) {
+    viewDateListener.off('value');
+    viewDateListener = null;
+  }
+  updateViewDateLabel();
+  var key = dateToKey(viewDate);
+  if(isToday(viewDate)) {
+    // 今日は通常のstartFirebaseListener()が管理しているvehiclesを使う
+    viewDateListener = null;
+    renderAll();
+    return;
+  }
+  // 過去/未来の日付：該当日のFirebaseデータを一回読み込み
+  document.getElementById('main-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div>読み込み中...</div></div>';
+  viewDateListener = fbDB.ref('vehicles/'+key);
+  viewDateListener.on('value', function(snapshot) {
+    var data = snapshot.val() || {};
+    var list = [];
+    Object.keys(data).forEach(function(k) {
+      var d = data[k];
+      var e = {
+        id: Number(d.id), company: d.company, plate: d.plate,
+        vehicle: d.vehicle, cargo: d.cargo, location: d.location||'',
+        note: d.note||'', client: d.client||'', isNight: d.isNight||false,
+        time: new Date(d.timeMs), timeStr: d.timeStr,
+        status: d.status, waitMin: d.waitMin>=0?d.waitMin:null,
+        reason: (d.reason&&d.reason!=='__clear__')?d.reason:''
+      };
+      list.push(e);
+    });
+    list.sort(function(a,b){return a.id-b.id;});
+    renderListForDate(list);
+  });
+}
+function renderListForDate(list) {
+  var waiting = list.filter(function(v){return v.status==='waiting';});
+  var done = list.filter(function(v){return v.status==='done';});
+  document.getElementById('list-count').textContent = waiting.length+'件';
+  var ob = document.getElementById('over-badge'); if(ob) ob.style.display='none';
+  var mainEl = document.getElementById('main-list');
+  var doneEl = document.getElementById('done-list');
+  var doneCount = document.getElementById('done-count');
+  // 待機中カラム
+  if(!list.length) {
+    if(mainEl) mainEl.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div>この日のデータはありません</div></div>';
+    if(doneEl) doneEl.innerHTML = '<div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div>';
+    if(doneCount) doneCount.textContent = '';
+    return;
+  }
+  var wHtml = '';
+  if(currentSort==='arrival') {
+    waiting.forEach(function(v,i){wHtml+=makeCard(v,i+1);});
+  } else if(currentSort==='cargo') {
+    var groups={};
+    waiting.forEach(function(v){if(!groups[v.cargo])groups[v.cargo]=[];groups[v.cargo].push(v);});
+    var pos=1;
+    Object.entries(groups).forEach(function(e){
+      wHtml+='<div class="group-header">🔹 '+e[0]+'（'+e[1].length+'台）</div>';
+      e[1].forEach(function(v){wHtml+=makeCard(v,pos++);});
+    });
+  } else {
+    var groups={};
+    waiting.forEach(function(v){var k=v.location||'未定';if(!groups[k])groups[k]=[];groups[k].push(v);});
+    var pos=1;
+    var order=CFG.locations.concat(['未定']);
+    order.forEach(function(key){
+      if(groups[key]){wHtml+='<div class="group-header">📍 '+key+'（'+groups[key].length+'台）</div>';groups[key].forEach(function(v){wHtml+=makeCard(v,pos++);}); }
+    });
+  }
+  if(mainEl) mainEl.innerHTML = wHtml || '<div class="empty-state"><div class="empty-icon">🚛</div><div>待機中の車両はありません</div></div>';
+  // 完了カラム（受付時刻の逆順）
+  if(doneCount) doneCount.textContent = done.length ? '（'+done.length+'台）' : '';
+  if(!done.length) {
+    if(doneEl) doneEl.innerHTML = '<div class="empty-state" style="font-size:12px;color:#94A3B8;">完了した車両がここに表示されます</div>';
+  } else {
+    var sortedDone = done.slice().sort(function(a,b){return b.id-a.id;});
+    if(doneEl) doneEl.innerHTML = sortedDone.map(makeDoneCard).join('');
+  }
 }
 
 // ===== 本日データリセット（Firebase） =====
@@ -4418,8 +4866,17 @@ function clearTodayData() {
     alert('削除エラー: ' + e.message);
   });
 }
+function clearViewDateData() {
+  var key = dateToKey(viewDate);
+  var label = key.slice(0,4)+'年'+key.slice(4,6)+'月'+key.slice(6,8)+'日';
+  if(!confirm(label+'のデータをすべて削除しますか？\n（全端末から消えます）')) return;
+  fbDB.ref('vehicles/'+key).remove().then(function() {
+    if(isToday(viewDate)){ vehicles=[]; counter=0; renderAll(); }
+    showFbStatus('🟢 同期中（リセット完了）');
+  }).catch(function(e){ alert('削除エラー: '+e.message); });
+}
 
-// ===== CSV =====
+// ===== CSV（今日分） =====
 function downloadCSV() {
   if(!vehicles.length){alert('データがありません');return;}
   var h=['受付番号','会社名','車両番号','車種','荷役方法','受付時刻','ステータス','待ち時間(分)','荷下ろし場所','夜間受付','調整理由','客先名','備考'];
@@ -4432,6 +4889,122 @@ function downloadCSV() {
   a.download='mabuchi_受付記録_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 
+// ===== 集計期間指定 =====
+var statsRangeMode = 'month';   // 'month' | 'week' | 'today' | 'custom'
+var statsFromKey = '';           // 開始日キー YYYYMMDD
+var statsToKey   = '';           // 終了日キー YYYYMMDD
+var statsAllVehicles = [];       // 集計対象の全車両データ
+
+function fmtKey(d) {
+  return d.getFullYear()+''+('0'+(d.getMonth()+1)).slice(-2)+''+('0'+d.getDate()).slice(-2);
+}
+function setStatsRange(mode) {
+  statsRangeMode = mode;
+  // ボタン active 切替
+  ['month','week','today','custom'].forEach(function(m){
+    var el=document.getElementById('stats-range-'+m);
+    if(el) el.classList.toggle('active', m===mode);
+  });
+  var customDiv = document.getElementById('stats-custom-range');
+  if(customDiv) customDiv.style.display = (mode==='custom') ? 'flex' : 'none';
+  if(mode !== 'custom') calcStatsRange();
+}
+function calcStatsRange() {
+  var now = new Date();
+  if(statsRangeMode==='today') {
+    statsFromKey = statsToKey = fmtKey(now);
+  } else if(statsRangeMode==='week') {
+    var mon = new Date(now); mon.setDate(now.getDate() - ((now.getDay()+6)%7));
+    statsFromKey = fmtKey(mon); statsToKey = fmtKey(now);
+  } else if(statsRangeMode==='month') {
+    var firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    statsFromKey = fmtKey(firstDay); statsToKey = fmtKey(now);
+  } else { return; } // custom は applyCustomRange() で設定
+  loadStatsForRange();
+}
+function applyCustomRange() {
+  var from = document.getElementById('stats-from').value;
+  var to   = document.getElementById('stats-to').value;
+  if(!from||!to){alert('開始日と終了日を選択してください');return;}
+  statsFromKey = from.replace(/-/g,'');
+  statsToKey   = to.replace(/-/g,'');
+  if(statsFromKey>statsToKey){alert('開始日は終了日より前にしてください');return;}
+  loadStatsForRange();
+}
+function loadStatsForRange() {
+  var labelEl   = document.getElementById('stats-range-label');
+  var loadingEl = document.getElementById('stats-loading');
+  if(loadingEl) loadingEl.style.display='';
+  if(labelEl)   labelEl.textContent = '';
+  // Firebase の vehicles/ 以下を全取得して範囲内の日付キーだけ集計
+  fbDB.ref('vehicles').once('value').then(function(snapshot) {
+    var allData = snapshot.val() || {};
+    var allKeys = Object.keys(allData).sort();
+    var inRange = allKeys.filter(function(k){ return k>=statsFromKey && k<=statsToKey; });
+    var combined = [];
+    inRange.forEach(function(dayKey) {
+      var dayData = allData[dayKey] || {};
+      Object.keys(dayData).forEach(function(k) {
+        var d = dayData[k];
+        combined.push({
+          id: d.id, company: d.company||'', plate: d.plate||'',
+          vehicle: d.vehicle||'', cargo: d.cargo||'', location: d.location||'',
+          note: d.note||'', client: d.client||'', isNight: d.isNight||false,
+          timeStr: d.timeStr||'', status: d.status||'waiting',
+          waitMin: d.waitMin>=0?Number(d.waitMin):null, dayKey: dayKey
+        });
+      });
+    });
+    statsAllVehicles = combined;
+    if(loadingEl) loadingEl.style.display='none';
+    // ラベル更新
+    var fromLabel = statsFromKey.slice(0,4)+'/'+(statsFromKey.slice(4,6))+'/'+(statsFromKey.slice(6,8));
+    var toLabel   = statsToKey.slice(0,4)+'/'+(statsToKey.slice(4,6))+'/'+(statsToKey.slice(6,8));
+    if(labelEl) labelEl.textContent = fromLabel+(statsFromKey===statsToKey?'':(statsFromKey===statsToKey?'':' 〜 '+toLabel))+' 計'+inRange.length+'日分 / '+combined.length+'件';
+    renderStatsPanel(combined);
+  }).catch(function(e){
+    if(loadingEl) loadingEl.style.display='none';
+    if(labelEl) labelEl.textContent='読み込みエラー: '+e.message;
+  });
+}
+function renderStatsPanel(list) {
+  var done    = list.filter(function(v){return v.status==='done';});
+  var total   = list.length;
+  var avg     = done.length?Math.round(done.reduce(function(s,v){return s+(v.waitMin||0);},0)/done.length):null;
+  var max     = done.length?Math.max.apply(null,done.map(function(v){return v.waitMin||0;})):null;
+  var night   = list.filter(function(v){return v.isNight;}).length;
+  var over    = list.filter(function(v){return v.waitMin!==null&&v.waitMin>=CFG.warnMin;}).length;
+  document.getElementById('s-total').textContent=total;
+  document.getElementById('s-done').textContent=done.length;
+  document.getElementById('s-avg').textContent=avg!==null?avg:'—';
+  document.getElementById('s-max').textContent=max!==null?max:'—';
+  document.getElementById('s-night').textContent=night;
+  document.getElementById('s-over').textContent=over;
+  var cargoMap={},vehicleMap={};
+  list.forEach(function(v){cargoMap[v.cargo]=(cargoMap[v.cargo]||0)+1;vehicleMap[v.vehicle]=(vehicleMap[v.vehicle]||0)+1;});
+  function makeBar(map,color){
+    if(!total) return '<div style="font-size:11px;color:#94A3B8;">データなし</div>';
+    return Object.entries(map).sort(function(a,b){return b[1]-a[1];}).map(function(e){
+      return '<div class="bar-row"><div class="bar-label">'+e[0]+'</div><div class="bar-wrap"><div class="bar-fill" style="background:'+color+';width:'+Math.round(e[1]/total*100)+'%;"></div></div><div class="bar-count">'+e[1]+'台</div></div>';
+    }).join('');
+  }
+  document.getElementById('cargo-stats').innerHTML=makeBar(cargoMap,'#028090');
+  document.getElementById('vehicle-stats').innerHTML=makeBar(vehicleMap,'#1E3A5F');
+}
+function downloadCSVRange() {
+  var list = statsAllVehicles.length ? statsAllVehicles : vehicles;
+  if(!list.length){alert('データがありません');return;}
+  var h=['日付','受付番号','会社名','車両番号','車種','荷役方法','受付時刻','ステータス','待ち時間(分)','荷下ろし場所','夜間受付','調整理由','客先名','備考'];
+  var rows=list.map(function(v){
+    return [v.dayKey||'',v.id,v.company,v.plate,v.vehicle,v.cargo,v.timeStr,v.status==='done'?'完了':'待機中',v.waitMin!==null?v.waitMin:'',v.location,v.isNight?'夜間':'通常',v.reason||'',v.client||'',v.note||''];
+  });
+  var csv=[h].concat(rows).map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  var fn='mabuchi_受付記録_'+statsFromKey+(statsFromKey!==statsToKey?'_'+statsToKey:'')+'.csv';
+  a.download=fn;a.click();
+}
+
 // ===== 初期化 =====
 function init() {
   loadCfg();
@@ -4441,11 +5014,32 @@ function init() {
   document.getElementById('ent-factory-name').textContent = CFG.factoryName;
   document.getElementById('print-factory-name').textContent = CFG.factoryName;
 
-  // URLパラメータ ?tab=xxx でタブを自動切替（QRコードからのアクセス対応）
+  // URLパラメータ処理（QRコードからのアクセス対応）
   try {
     var params = new URLSearchParams(window.location.search);
-    var tabParam = params.get('tab');
-    if(tabParam && TABS.indexOf(tabParam) >= 0) {
+    var modeParam = params.get('mode');
+    var tabParam  = params.get('tab');
+
+    if(modeParam === 'driver') {
+      // ===== ドライバーモード =====
+      // タブバー・ヘッダー全体を非表示にし、ドライバー専用UIのみ表示
+      document.querySelector('.tabs').style.display = 'none';
+      document.querySelector('.header').style.display = 'none';
+      // ドライバー向けのタブを表示
+      var driverTab = (tabParam === 'night') ? 'night' : 'driver';
+      // 全パネルを非表示にしてからドライバー用だけ表示
+      document.querySelectorAll('.panel').forEach(function(p){
+        p.classList.remove('active');
+        p.style.display = 'none';
+      });
+      var driverPanel = document.getElementById('panel-' + driverTab);
+      if(driverPanel){
+        driverPanel.style.display = '';
+        driverPanel.classList.add('active');
+      }
+      // ドライバーモードフラグをグローバルに保持
+      window.DRIVER_MODE = true;
+    } else if(tabParam && TABS.indexOf(tabParam) >= 0) {
       switchTab(tabParam);
     }
   } catch(e) {}
@@ -4463,6 +5057,12 @@ function init() {
   startCfgListener();
   // Firebase 車番履歴リスナー起動（全端末で履歴を共有）
   startHistoryListener();
+
+  // 日付ナビゲーション初期化
+  updateViewDateLabel();
+
+  // 集計タブ：今月をデフォルト集計（ページ読み込み後少し待ってから）
+  setTimeout(function(){ calcStatsRange(); }, 2000);
 
   setInterval(renderAll, 60000);
   renderAll();
